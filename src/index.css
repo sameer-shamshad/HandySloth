@@ -1,8 +1,75 @@
+/* Always import Tailwind *once* */
 @import "tailwindcss";
+/* @tailwind base;
+@tailwind components; */
+@tailwind utilities;
+
+
+:root {
+  --group-bg: #F8F8FE0D;
+  --primary-bg: #F8F8FE;
+  --secondary-bg: #FFFFFF;
+
+  --black-color: #000000;
+  --primary-color: #060606;
+  --secondary-color: #494747;
+
+  --main-color: #A9ECEC;
+  --shadow-color: #A9ECEC80;
+}
+
+:root.dark {
+  --group-bg: #15192C0D;
+  --primary-bg: #070A12;
+  --secondary-bg: #15192C;
+
+  --primary-color: #FFFFFF;
+  --secondary-color: #15192C;
+  
+  --main-color: #A9ECEC;
+  --white-color: #FFFFFF;
+  --shadow-color: #A9ECEC80;
+}
+
+@layer base {
+  :root {
+    color: var(--primary-color);
+    background-color: var(--primary-bg);
+  }
+
+  .dark :root {
+    --color-primary-color: var(--primary-color);
+    --color-secondary-color: var(--secondary-color);
+    --color-primary-bg: var(--primary-bg);
+    --color-secondary-bg: var(--secondary-bg);
+    --color-group-bg: var(--group-bg);
+    --color-black-color: var(--black-color);
+    --color-shadow-color: var(--shadow-color);
+    --color-main-color: var(--main-color);
+    --color-white-color: var(--white-color);
+  }
+}
+
+@theme {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  --color-primary-color: var(--primary-color);
+  --color-secondary-color: var(--secondary-color);
+  --color-primary-bg: var(--primary-bg);
+  --color-secondary-bg: var(--secondary-bg);
+  --color-group-bg: var(--group-bg);
+  --color-black-color: var(--black-color);
+  --color-shadow-color: var(--shadow-color);
+  --color-main-color: var(--main-color);
+  --color-white-color: var(--white-color);
+}
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

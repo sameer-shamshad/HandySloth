@@ -1,9 +1,5 @@
-/* Always import Tailwind *once* */
 @import "tailwindcss";
-/* @tailwind base;
-@tailwind components; */
 @tailwind utilities;
-
 
 :root {
   --group-bg: #F8F8FE0D;
@@ -27,7 +23,6 @@
   --secondary-color: #15192C;
   
   --main-color: #A9ECEC;
-  --white-color: #FFFFFF;
   --shadow-color: #A9ECEC80;
 }
 
@@ -50,6 +45,8 @@
   }
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
@@ -59,13 +56,14 @@
 
   --color-primary-color: var(--primary-color);
   --color-secondary-color: var(--secondary-color);
+
+  --color-group-bg: var(--group-bg);
   --color-primary-bg: var(--primary-bg);
   --color-secondary-bg: var(--secondary-bg);
-  --color-group-bg: var(--group-bg);
+
+  --color-main-color: var(--main-color);
   --color-black-color: var(--black-color);
   --color-shadow-color: var(--shadow-color);
-  --color-main-color: var(--main-color);
-  --color-white-color: var(--white-color);
 }
 
 :root {
@@ -87,4 +85,21 @@ body {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
+}
+
+button {
+  height: 40px;
+  min-width: 40px;
+  width: max-content;
+  gap: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: var(--primary-bg);
+  color: var(--primary-color);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }

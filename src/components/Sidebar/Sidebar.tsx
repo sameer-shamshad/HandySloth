@@ -61,7 +61,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside id='sidebar' className="fixed top-0 -left-full sm:relative sm:left-0 flex flex-col h-screen w-64 
+    <aside id='sidebar' className="fixed top-0 -left-full md:relative md:left-0 flex flex-col h-screen w-64 
       bg-main-color dark:bg-secondary-bg border-r border-group-bg p-3 sm:p-6
       2xl:flex-row 2xl:w-full 2xl:h-[80px] 2xl:items-center"
     >
@@ -98,7 +98,7 @@ const Sidebar = () => {
 
       {/* Bottom Controls */}
       <div className="
-          relative gap-3 flex items-center justify-between border-t border-group-bg mt-auto
+          relative gap-3 flex items-center justify-between mt-auto
           [&>button]:bg-primary-bg [&>button]:dark:bg-main-color! [&>button]:text-black-color! 
           [&>button]:font-medium [&>button]:hover:opacity-90 [&>button]:transition-opacity [&>button]:rounded-lg
           2xl:ml-auto

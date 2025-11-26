@@ -2,7 +2,7 @@
 @tailwind utilities;
 
 :root {
-  --group-bg: #F8F8FE;
+  --group-bg: #F7F7FD;
   --primary-bg: #FFFFFF;
   --secondary-bg: #F8F8FE;
 
@@ -12,12 +12,13 @@
 
   --main-color: #A9ECEC;
   --shadow-color: #A9ECEC80;
+  --border-color: #777;
 }
 
 :root.dark {
-  --group-bg: #15192C0D;
-  --primary-bg: #070A12;
-  --secondary-bg: #15192C;
+  --group-bg: #13151F;
+  --primary-bg: #15192C;
+  --secondary-bg: #34384C;
 
   --primary-color: #FFFFFF;
   --secondary-color: #15192C;
@@ -42,6 +43,7 @@
     --color-shadow-color: var(--shadow-color);
     --color-main-color: var(--main-color);
     --color-white-color: var(--white-color);
+    --color-border-color: var(--border-color);
   }
 }
 
@@ -52,7 +54,7 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
-  --breakpoint-2xl: 1536px;
+  --breakpoint-2xl: 1600px;
 
   --color-primary-color: var(--primary-color);
   --color-secondary-color: var(--secondary-color);

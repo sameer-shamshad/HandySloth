@@ -1,15 +1,23 @@
-import React from 'react';
+import { useMachine } from '@xstate/react';
+import ToolsOverview from '../components/Tools/ToolsOverview';
+import RecentlyAdded from '../components/Tools/RecentlyAdded';
+import { toolMachine, selectRecentTools } from '../machines/ToolMachine';
 
 const HomePage = () => {
   return (
-    <div className='flex flex-col gap-4 bg-group-bg p-4 rounded-3xl'>
-      <input 
-        type='search' 
-        placeholder='Search' 
-        className='w-full h-10 bg-primary-bg border border-group-bg rounded-full p-2 hidden sm:block'
-      />
+    <div className="flex flex-col gap-6 rounded-3xl bg-transparent">
+      <div className="flex flex-col sm:flex-row sm:items-center">
+        <input
+          type="search"
+          placeholder="Search tools"
+          className="h-12 flex-1 rounded-full border border-group-bg bg-primary-bg hidden 2xl:block px-5 text-sm outline-none focus:ring-2 focus:ring-main-color/40"
+        />
+      </div>
+
+      <ToolsOverview />
+      <RecentlyAdded />
     </div>
-  )
+  );
 };
 
 export default HomePage;

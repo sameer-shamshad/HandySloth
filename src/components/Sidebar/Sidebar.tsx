@@ -1,8 +1,10 @@
+// import "./Sidebar.css";
 import { useEffect } from 'react';
+import SettingsMenu from './SettingsMenu';
 import { useMachine } from '@xstate/react';
 import { NavLink } from 'react-router-dom';
+import SlothIcon from '../../assets/SlothIcon';
 import { sidebarMachine } from '../../machines/SidebarMachine';
-import SettingsMenu from './SettingsMenu';
 
 interface NavItem {
   label: string;
@@ -11,7 +13,7 @@ interface NavItem {
   invert?: boolean;
 }
 
-const Sidebbar = () => {
+const Sidebar = () => {
   
   const getInitialDarkMode = () => {
     if (typeof window === 'undefined') return false;
@@ -59,15 +61,18 @@ const Sidebbar = () => {
   ];
 
   return (
-    <aside className="flex flex-col h-screen w-64 bg-main-color dark:bg-secondary-bg border-r border-group-bg p-6
+    <aside id='sidebar' className="fixed top-0 -left-full sm:relative sm:left-0 flex flex-col h-screen w-64 
+      bg-main-color dark:bg-secondary-bg border-r border-group-bg p-3 sm:p-6
       2xl:flex-row 2xl:w-full 2xl:h-[80px] 2xl:items-center"
     >
       {/* Logo Section */}
-      <div className="flex items-center gap-3 p-6 border-b border-group-bg">
+      <div className="flex items-center gap-3 py-6 border-shadow-color">
         <div className="w-10 h-10 rounded-full bg-shadow-color flex items-center justify-center">
           <SlothIcon />
         </div>
         <span className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-black-color'}`}>HandySloth</span>
+
+        <button className="material-symbols-outlined sm:invisible" onClick={() => send({ type: 'TOGGLE_SIDEBAR' })}>menu_open</button>
       </div>
 
       {/* Navigation Items */}
@@ -129,14 +134,4 @@ const Sidebbar = () => {
   );
 };
 
-// Icon Components
-const SlothIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.3" />
-    <circle cx="9" cy="9" r="1.5" fill="currentColor" />
-    <circle cx="15" cy="9" r="1.5" fill="currentColor" />
-    <path d="M8 14C8 14 10 16 12 16C14 16 16 14 16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
-export default Sidebbar;
+export default Sidebar;

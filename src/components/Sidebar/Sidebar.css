@@ -1,0 +1,7 @@
+.sidebar {
+    left: -100%;
+}
+
+.sidebar.active {
+    left: 0;
+}

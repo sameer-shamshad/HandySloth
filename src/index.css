@@ -2,9 +2,9 @@
 @tailwind utilities;
 
 :root {
-  --group-bg: #F8F8FE0D;
-  --primary-bg: #F8F8FE;
-  --secondary-bg: #FFFFFF;
+  --group-bg: #F8F8FE;
+  --primary-bg: #FFFFFF;
+  --secondary-bg: #F8F8FE;
 
   --black-color: #000000;
   --primary-color: #060606;
@@ -102,4 +102,12 @@ button {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+
+input[type="search"] {
+  border: none;
+  outline: none;
+  padding: 10px ;
+  font-size: 14px;
+  font-weight: 600;
 }

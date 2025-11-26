@@ -1,70 +1,70 @@
-const companyLinks = [
-  { label: 'Affiliate Program', href: '#' },
-  { label: 'Sponsor Us', href: '#' },
-  { label: 'Promote Tool', href: '#' },
-  { label: 'Manage Ads', href: '#' },
-];
+import { FaXTwitter, FaEnvelope } from 'react-icons/fa6';
 
-const aboutLinks = [
-  { label: 'About Us', href: '#' },
-  { label: 'Terms', href: '#' },
-  { label: 'Privacy', href: '#' },
-  { label: 'Contact Us', href: '#' },
+const footerSections = [
+  {
+    title: 'Company',
+    links: [
+      { label: 'Affiliate Program', href: '#' },
+      { label: 'Sponsor Us', href: '#' },
+      { label: 'Promote Tool', href: '#' },
+      { label: 'Manage Ads', href: '#' },
+    ],
+  },
+  {
+    title: 'About',
+    links: [
+      { label: 'About Us', href: '#' },
+      { label: 'Terms', href: '#' },
+      { label: 'Privacy', href: '#' },
+      { label: 'Contact Us', href: '#' },
+    ],
+  },
 ];
 
 const socialIcons = [
-  { icon: 'close', label: 'X (Twitter)' },
-  { icon: 'mail', label: 'Email' },
+  { icon: <FaXTwitter />, label: 'X (Twitter)' },
+  { icon: <FaEnvelope />, label: 'Email' },
 ];
 
 const Footer = () => {
   return (
-    <footer className="w-full border-t border-group-bg bg-primary-bg px-6 py-10 text-sm text-secondary-color dark:bg-secondary-bg dark:text-gray-300">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
-        <div className="space-y-4">
-          <p className="text-base font-semibold text-black-color dark:text-white">Company Name</p>
-          <div className="flex gap-3">
-            {socialIcons.map((item) => (
-              <button
-                key={item.icon}
+    <footer className="mt-auto w-full bg-primary-bg p-4 2xl:px-15 text-sm text-secondary-color dark:bg-secondary-bg dark:text-gray-300 
+      grid grid-cols-2 md:grid-cols-3 gap-4 place-items-center"
+    >
+      <div className="h-full">
+        <p className="text-base font-semibold text-primary-color">Company Name</p>
+        <div className="flex gap-3 py-3">
+          {
+            socialIcons.map((item) => (
+              <a
                 type="button"
+                key={item.label}
                 aria-label={item.label}
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-group-bg bg-white shadow-sm transition hover:opacity-80 dark:bg-black/30"
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-black text-white transition hover:opacity-80 dark:bg-white dark:text-black"
               >
-                <span className="material-symbols-outlined text-lg text-black-color dark:text-white">{item.icon}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-1 flex-col gap-8 text-sm font-medium text-secondary-color dark:text-gray-300 md:flex-row md:justify-end">
-          <div>
-            <p className="mb-3 text-base font-semibold text-black-color dark:text-white">Company</p>
-            <ul className="space-y-2">
-              {companyLinks.map((link) => (
-                <li key={link.label}>
-                  <a className="transition hover:text-main-color" href={link.href}>
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <p className="mb-3 text-base font-semibold text-black-color dark:text-white">About</p>
-            <ul className="space-y-2">
-              {aboutLinks.map((link) => (
-                <li key={link.label}>
-                  <a className="transition hover:text-main-color" href={link.href}>
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+                <span className="text-lg">{item.icon}</span>
+              </a>
+            ))
+          }
         </div>
       </div>
+
+      {
+        footerSections.map((section) => (
+          <div key={section.title}>
+            <p className="mb-3 text-base font-semibold text-black-color dark:text-white">{section.title}</p>
+            <ul className="space-y-2">
+              {section.links.map((link) => (
+                <li key={link.label}>
+                  <a className="transition hover:text-main-color" href={link.href}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
     </footer>
   );
 };

@@ -6,17 +6,22 @@ import MobileSidebar from './components/Sidebar/MobileSidebar';
 
 const App = () => {
   return (
-    <div>
+    <div className='flex flex-col md:flex-row 2xl:flex-col h-screen'>
       <MobileSidebar />
       <Sidebar />
 
-      <main className='w-full h-[calc(100vh-260px)] bg-group-bg 2xl:p-14 flex flex-col'>
+    <div className='flex flex-col h-full w-full bg-primary-bg'>
+      <main className='w-full md:w-[calc(100%-30px)] lg:w-[calc(100%-60px)] 2xl:w-[calc(100%-90px)] h-full bg-group-bg 
+        md:m-[15px] lg:m-[30px] 2xl:m-[45px] rounded-3xl flex flex-col'>
         <Routes>
           <Route path='/' element={<HomePage />} />
         </Routes>
+
       </main>
 
       <Footer />
+    </div>
+
     </div>
   )
 }

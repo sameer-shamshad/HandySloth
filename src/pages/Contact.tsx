@@ -23,12 +23,14 @@ const Contact = () => {
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-2 [&>input]:rounded-lg [&>input]:p-2 [&>input]:text-primary-color 
                 [&>input]:bg-secondary-bg [&>input]:outline-none [&>input]:text-sm'>
                 <input 
+                    required
                     type='text' 
                     placeholder='First Name'
                     value={state.context.firstName}
                     onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'firstName', value: e.target.value })}
                 />
                 <input 
+                    required
                     type='text' 
                     placeholder='Last Name'
                     value={state.context.lastName}
@@ -37,6 +39,7 @@ const Contact = () => {
             </div>
 
             <input 
+                required
                 type='email' 
                 placeholder='Email'
                 value={state.context.email}
@@ -46,6 +49,7 @@ const Contact = () => {
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-2 [&>input]:rounded-lg [&>input]:p-2 [&>input]:text-primary-color 
                 [&>input]:bg-secondary-bg [&>input]:outline-none [&>input]:text-sm'>
                 <input 
+                    required
                     type="tel" 
                     placeholder="Contact Number"
                     value={state.context.phone}
@@ -53,6 +57,7 @@ const Contact = () => {
                 />
 
                 <input 
+                    required
                     type="text" 
                     placeholder="Company Name"
                     value={state.context.company}
@@ -61,8 +66,9 @@ const Contact = () => {
             </div>
 
             <textarea 
-                placeholder='Message' 
                 rows={5}
+                required
+                placeholder='Message' 
                 value={state.context.message}
                 onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'message', value: e.target.value })}
             />
@@ -70,12 +76,15 @@ const Contact = () => {
             <div className='gap-2 flex items-center justify-between sm:justify-start'>
                 <label htmlFor="reason" className='text-sm text-primary-color sm:text-[16px]'>Reason for contact</label>
                 <select 
+                    required
                     id="reason" 
                     className='rounded-lg p-2 bg-transparent text-sm text-primary-color border-2 border-border-color outline-none sm:ml-20'
                     value={state.context.reason}
                     onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'reason', value: e.target.value })}
                 >
-                    <option value="" selected disabled>Reason for contact</option>
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
                 </select>
             </div>
 

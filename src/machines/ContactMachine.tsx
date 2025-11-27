@@ -17,7 +17,8 @@ export const contactMachine = setup({
         context: {} as Contact,
         events: {} as
             | { type: 'CHANGE_FIELD'; field: keyof Contact; value: Contact[keyof Contact] }
-            | { type: 'SUBMIT_CONTACT' },
+            | { type: 'SUBMIT_CONTACT' }
+            | { type: 'RESET' },
     },
     actions: {
         changeField: assign(({ context, event }) => {
@@ -27,6 +28,7 @@ export const contactMachine = setup({
                 [event.field]: event.value,
             };
         }),
+        resetContact: assign(() => ({ ...initialContactContext })),
         submitContact: ({ context }) => {
             console.info('Submitting contact payload', context);
         },
@@ -59,10 +61,9 @@ export const contactMachine = setup({
             },
         },
         success: {
-            type: 'final',
-        },
-        error: {
-            type: 'final',
+            after: {
+                1000: { actions: 'resetContact', target: 'idle' },
+            },
         },
     },
 })

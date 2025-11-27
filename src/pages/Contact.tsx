@@ -63,6 +63,8 @@ const Contact = () => {
             <textarea 
                 placeholder='Message' 
                 rows={5}
+                value={state.context.message}
+                onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'message', value: e.target.value })}
             />
 
             <div className='gap-2 flex items-center justify-between sm:justify-start'>
@@ -73,7 +75,7 @@ const Contact = () => {
                     value={state.context.reason}
                     onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'reason', value: e.target.value })}
                 >
-                    <option value="1">Reason for contact</option>
+                    <option value="" selected disabled>Reason for contact</option>
                 </select>
             </div>
 

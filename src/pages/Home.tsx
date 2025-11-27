@@ -1,7 +1,5 @@
-import { useMachine } from '@xstate/react';
 import ToolsOverview from '../components/Tools/ToolsOverview';
 import RecentlyAdded from '../components/Tools/RecentlyAdded';
-import { toolMachine, selectRecentTools } from '../machines/ToolMachine';
 
 const HomePage = () => {
   return (

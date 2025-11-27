@@ -12,19 +12,20 @@
 
   --main-color: #A9ECEC;
   --shadow-color: #A9ECEC80;
-  --border-color: #777;
+  --border-color: rgba(0, 0, 0, 0.2);
 }
 
 :root.dark {
   --group-bg: #13151F;
   --primary-bg: #15192C;
   --secondary-bg: #34384C;
-
+  
   --primary-color: #FFFFFF;
   --secondary-color: #15192C;
   
   --main-color: #A9ECEC;
   --shadow-color: #A9ECEC80;
+  --border-color: rgba(255, 255, 255, 0.2);
 }
 
 @layer base {

@@ -71,8 +71,7 @@ export const toolMachine = setup({
   },
 });
 
-const sortBy = (tools: Tool[], key: 'views' | 'clicks') =>
-  [...tools].sort((a, b) => b[key] - a[key]);
+const sortBy = (tools: Tool[], key: 'views' | 'clicks') => [...tools].sort((a, b) => b[key] - a[key]);
 
 export const selectTrendingTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
 export const selectPopularTools = (tools: Tool[], limit = 5) => sortBy(tools, 'clicks').slice(0, limit);

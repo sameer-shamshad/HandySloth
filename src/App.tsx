@@ -1,8 +1,11 @@
 import HomePage from './pages/Home';
+import Contact from './pages/Contact';
+import PopularPage from './pages/Popular';
 import TrendingPage from './pages/Trending';
 
 import Footer from './components/Footer/Footer';
 import { Routes, Route } from 'react-router-dom';
+
 import Sidebar from './components/Sidebar/Sidebar';
 import MobileSidebar from './components/Sidebar/MobileSidebar';
 
@@ -18,6 +21,8 @@ const App = () => {
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/trending' element={<TrendingPage />} />
+          <Route path='/popular' element={<PopularPage />} />
+          <Route path='/contact' element={<Contact />} />
         </Routes>
 
       </main>

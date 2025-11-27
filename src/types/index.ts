@@ -15,3 +15,14 @@ export interface Tool {
   logo: string;
   links: ToolLink[];
 }
+
+export type Contact = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  company: string;
+  message: string;
+  reason: string;
+  terms: boolean;
+}

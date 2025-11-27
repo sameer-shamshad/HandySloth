@@ -1,13 +1,13 @@
 import React from "react";
 import { useMachine } from "@xstate/react";
-// import { contactMachine } from "../machines/ContactMachine";
+import { contactMachine } from "../machines/ContactMachine";
 
 const Contact = () => {
-    // const [state, send] = useMachine(contactMachine);
+    const [state, send] = useMachine(contactMachine);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('Form submitted');
+        send({ type: 'SUBMIT_CONTACT' });
     }
   return (
     <div>
@@ -25,16 +25,22 @@ const Contact = () => {
                 <input 
                     type='text' 
                     placeholder='First Name'
+                    value={state.context.firstName}
+                    onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'firstName', value: e.target.value })}
                 />
                 <input 
                     type='text' 
                     placeholder='Last Name'
+                    value={state.context.lastName}
+                    onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'lastName', value: e.target.value })}
                 />
             </div>
 
             <input 
                 type='email' 
                 placeholder='Email'
+                value={state.context.email}
+                onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'email', value: e.target.value })}
             />
 
             <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-2 [&>input]:rounded-lg [&>input]:p-2 [&>input]:text-primary-color 
@@ -42,11 +48,15 @@ const Contact = () => {
                 <input 
                     type="tel" 
                     placeholder="Contact Number"
+                    value={state.context.phone}
+                    onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'phone', value: e.target.value })}
                 />
 
                 <input 
                     type="text" 
                     placeholder="Company Name"
+                    value={state.context.company}
+                    onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'company', value: e.target.value })}
                 />
             </div>
 
@@ -60,6 +70,8 @@ const Contact = () => {
                 <select 
                     id="reason" 
                     className='rounded-lg p-2 bg-transparent text-sm text-primary-color border-2 border-border-color outline-none sm:ml-20'
+                    value={state.context.reason}
+                    onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'reason', value: e.target.value })}
                 >
                     <option value="1">Reason for contact</option>
                 </select>
@@ -70,7 +82,8 @@ const Contact = () => {
                     id='terms' 
                     type='checkbox' 
                     className='w-5 h-5'
-                    onChange={() => {}}
+                    checked={state.context.terms}
+                    onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'terms', value: e.target.checked })}
                 />
                 <label htmlFor='terms' className='flex items-center gap-1 text-sm text-secondary-color
                     [&>a]:text-primary-color [&>a]:font-extrabold [&>a]:hover:underline! [&>a]:underline-offset-3 [&>span]:-ml-1'

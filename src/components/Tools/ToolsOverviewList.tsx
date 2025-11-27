@@ -8,8 +8,8 @@ const ToolsOverviewList = ({ tools = [], toolsLabel = "" }: { tools: Tool[], too
             {
                 tools?.length > 0 && tools.map((tool, index) => (
                         <div key={tool.id} className='flex items-center gap-3 py-5 border-b border-border-color last:border-b-0'>
-                            <span className='text-xs font-semibold text-primary-color rounded-full px-2 py-1'>{index + 1}.</span>
-                            <div className='flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-4'>
+                            <span className='text-xs font-semibold text-primary-color px-2 py-1'>{index + 1}</span>
+                            <div className='flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-4 xl:ml-6 xl:gap-5'>
                                 <img src={tool.logo} alt={tool.name} className='h-6 w-6 lg:h-8 lg:w-8 rounded-full object-cover' />
                                 <span className='text-xs font-bold text-primary-color text-wrap'>{tool.name}</span>
                             </div>

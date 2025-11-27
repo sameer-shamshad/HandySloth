@@ -3,7 +3,7 @@ import type { Tool } from "../types";
 export const tools: Tool[] = [
   {
     id: 'coindar',
-    name: 'Coindar',
+    name: 'The coin perspective third line',
     description: 'Live crypto calendar to discover launches and protocol updates.',
     category: 'Analytics',
     tags: ['recent', 'trending'],
@@ -212,7 +212,7 @@ export const tools: Tool[] = [
   {
     id: 'certik',
     name: 'CertiK',
-    description: 'Security audit platform for smart contracts and blockchains.',
+    description: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
     category: 'Security',
     tags: ['recent', 'trending'],
     clicks: 2100,

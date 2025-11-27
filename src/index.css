@@ -20,32 +20,12 @@
   --secondary-bg: #34384C;
   
   --primary-color: #FFFFFF;
-  --secondary-color: #15192C;
+  --secondary-color: #888;
   
   --main-color: #A9ECEC;
   --shadow-color: #A9ECEC80;
-  --border-color: rgba(255, 255, 255, 0.2);
+  --border-color: rgba(255, 255, 255, .1);
 }
-
-/* @layer base {
-  :root {
-    color: var(--primary-color);
-    background-color: var(--primary-bg);
-  }
-
-  .dark :root {
-    --color-primary-color: var(--primary-color);
-    --color-secondary-color: var(--secondary-color);
-    --color-primary-bg: var(--primary-bg);
-    --color-secondary-bg: var(--secondary-bg);
-    --color-group-bg: var(--group-bg);
-    --color-black-color: var(--black-color);
-    --color-shadow-color: var(--shadow-color);
-    --color-main-color: var(--main-color);
-    --color-white-color: var(--white-color);
-    --color-border-color: var(--border-color);
-  }
-} */
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -54,6 +34,7 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
+  --breakpoint-card: 1350px;
   --breakpoint-2xl: 1600px;
 
   --color-primary-color: var(--primary-color);
@@ -64,12 +45,13 @@
   --color-secondary-bg: var(--secondary-bg);
 
   --color-main-color: var(--main-color);
+  --color-border-color: var(--border-color);
   --color-black-color: var(--black-color);
   --color-shadow-color: var(--shadow-color);
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Maven Pro", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

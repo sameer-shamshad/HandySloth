@@ -1,5 +1,3 @@
-import React from 'react';
-
 const submitToolButtons = [
     { icon: 'add', title: 'Submit Tool' },
     { icon: 'star', title: 'Get Featured' },

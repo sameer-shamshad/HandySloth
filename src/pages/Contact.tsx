@@ -2,7 +2,7 @@ import React from "react";
 import { useMachine } from "@xstate/react";
 import { contactMachine } from "../machines/ContactMachine";
 
-const Contact = () => {
+const ContactPage = () => {
     const [state, send] = useMachine(contactMachine);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -15,7 +15,7 @@ const Contact = () => {
         <h3 className='pb-4 text-xl font-medium text-primary-color'>Contact Us</h3>
         <form 
             onSubmit={handleSubmit}
-            className='flex flex-col gap-3 bg-[#E2E2FF] p-4 py-8 rounded-2xl dark:bg-primary-bg
+            className='flex flex-col gap-3 bg-[#E2E2FF] p-4 py-8 rounded-2xl dark:bg-primary-bg sm:p-6 md:p-8 lg:p-10 xl:p-15
                 [&>input]:rounded-lg [&>input]:p-2 [&>input]:text-primary-color [&>input]:text-sm
                 [&>input]:bg-secondary-bg [&>input]:outline-none [&>textarea]:rounded-lg 
                 [&>textarea]:p-2 [&>textarea]:text-primary-color [&>textarea]:bg-secondary-bg [&>textarea]:outline-none'
@@ -88,7 +88,7 @@ const Contact = () => {
                 </select>
             </div>
 
-            <div className='flex items-center gap-4'>
+            <div className='flex items-center gap-4 pt-5'>
                 <input 
                     id='terms' 
                     type='checkbox' 
@@ -96,8 +96,8 @@ const Contact = () => {
                     checked={state.context.terms}
                     onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'terms', value: e.target.checked })}
                 />
-                <label htmlFor='terms' className='flex items-center gap-1 text-sm text-secondary-color
-                    [&>a]:text-primary-color [&>a]:font-extrabold [&>a]:hover:underline! [&>a]:underline-offset-3 [&>span]:-ml-1'
+                <label htmlFor='terms' className='flex items-center gap-1 text-sm text-primary-color
+                    [&>a]:text-primary-color [&>a]:font-extrabold [&>a]:underline! [&>a]:underline-offset-3 [&>span]:-ml-1'
                 >
                     <span>I agree to</span>
                     <a href="#">Terms of service</a>
@@ -117,4 +117,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default ContactPage;

@@ -62,7 +62,7 @@ const Sidebar = () => {
 
   return (
     <aside id='sidebar' className="fixed top-0 -left-full md:relative md:left-0 flex flex-col h-screen w-64 
-      bg-main-color dark:bg-secondary-bg border-r border-group-bg p-3 sm:p-6
+      bg-main-color dark:bg-primary-bg border-r border-group-bg p-3 sm:p-6
       2xl:flex-row 2xl:w-full 2xl:h-[80px] 2xl:items-center"
     >
       {/* Logo Section */}

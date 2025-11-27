@@ -12,7 +12,7 @@ const TrendingPage = () => {
   return (
     <div className='h-full'>
         <h3 className='pb-4 text-xl font-medium text-primary-color'>Trending</h3>
-        <ToolsGrid tools={trendingTools} />
+        <ToolsGrid tools={trendingTools} tag="index" />
     </div>
   );
 };

@@ -9,8 +9,8 @@ const RecentlyAdded = () => {
   const recentTools: Tool[] = selectRecentTools(tools, 6);
   return (
     <section className="bg-group-bg">
-      <h2 className="text-xl font-extrabold text-primary-color px-3 pt-5">Recently Added</h2>
-      <ToolsGrid tools={recentTools} />
+      <h2 className="text-xl font-extrabold text-primary-color px-3 py-5">Recently Added</h2>
+      <ToolsGrid tools={recentTools} tag="NEW" />
     </section>
   );
 };

@@ -1,8 +1,6 @@
-import { assign, setup } from 'xstate';
 import type { Tool } from '../types';
-import { tools as seedTools } from '../dummy-data/tools';
-
-const initialTools: Tool[] = (seedTools as Tool[]).map((tool) => ({ ...tool }));
+import { assign, setup } from 'xstate';
+import { fetchToolsMock } from '../services/toolsService';
 
 export const toolMachine = setup({
   types: {
@@ -21,6 +19,11 @@ export const toolMachine = setup({
       | { type: 'INCREMENT_CLICK'; id: string },
   },
   actions: {
+    loadTools: ({ self }) => {
+      fetchToolsMock().then((tools) => {
+        self.send({ type: 'FETCH_TOOLS', tools });
+      });
+    },
     fetchTools: assign(({ context, event }) => {
       console.log('fetchTools', event, context);
       if (event.type !== 'FETCH_TOOLS') return context;
@@ -96,13 +99,26 @@ export const toolMachine = setup({
   },
 }).createMachine({
   id: 'toolMachine',
-  initial: 'idle',
+  initial: 'loading',
   context: {
-    tools: initialTools,
+    tools: [],
+    recentTools: [],
+    popularTools: [],
+    trendingTools: [],
   },
   states: {
+    loading: {
+      entry: 'loadTools',
+      on: {
+        FETCH_TOOLS: {
+          target: 'idle',
+          actions: 'fetchTools',
+        },
+      },
+    },
     idle: {
       on: {
+        FETCH_TOOLS: { actions: 'fetchTools' },
         ADD_TOOL: { actions: 'addTool' },
         UPDATE_TOOL: { actions: 'updateTool' },
         DELETE_TOOL: { actions: 'deleteTool' },

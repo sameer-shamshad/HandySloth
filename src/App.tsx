@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import { ToolsProvider } from './context/ToolsProvider';
-import { HomePage, ContactPage, PopularPage, TrendingPage, SubmitToolPage, NotFoundPage, CategoriesPage } from './pages';
+import { HomePage, ContactPage, PopularPage, TrendingPage, SubmitToolPage, NotFoundPage, CategoriesPage, DashboardPage } from './pages';
 
 const App = () => {
   return (
@@ -9,6 +9,7 @@ const App = () => {
       <Routes>
         <Route path='/' element={<DashboardLayout />}>
           <Route index path='/' element={<HomePage />} />
+          <Route path='/dashboard' element={<DashboardPage />} />
           <Route path='/trending' element={<TrendingPage />} />
           <Route path='/popular' element={<PopularPage />} />
           <Route path='/category' element={<CategoriesPage />} />

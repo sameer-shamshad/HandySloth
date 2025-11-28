@@ -28,7 +28,7 @@ const socialIcons = [
 
 const Footer = () => {
   return (
-    <footer className="mt-auto w-full bg-primary-bg p-4 2xl:px-15 text-sm text-secondary-color dark:bg-black-color dark:text-gray-300 
+    <footer className="mt-auto w-full bg-primary-bg p-4 2xl:px-15 text-sm text-secondary-color dark:bg-primary-bg sm:dark:bg-black-color dark:text-gray-300 
       grid grid-cols-2 md:grid-cols-3 gap-4 place-items-center"
     >
       <div className="h-full">

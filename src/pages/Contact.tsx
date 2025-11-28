@@ -78,11 +78,11 @@ const ContactPage = () => {
                 <select 
                     required
                     id="reason" 
-                    className='rounded-lg p-2 bg-transparent text-sm text-primary-color border-2 border-border-color outline-none sm:ml-20'
+                    className='rounded-lg p-2 bg-transparent text-sm text-primary-color border-2 border-border-color outline-none sm:ml-3'
                     value={state.context.reason}
                     onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'reason', value: e.target.value })}
                 >
-                    <option value="1" selected>1</option>
+                    <option value="" disabled>Reason for contact</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                 </select>
@@ -109,7 +109,7 @@ const ContactPage = () => {
 
             <button 
                 type='submit'
-                className='w-full! bg-white! text-black! px-4 py-2 rounded-lg'
+                className='w-full! bg-white! text-black! px-4 py-2 rounded-lg mt-2'
             >Send Message</button>
         </form>
     </div>

@@ -8,9 +8,9 @@ const submitToolButtons = [
 const SubmitToolPage = () => {
   return (
     <section className='h-full w-full'>
-        <h3 className='pb-4 text-xl font-medium text-primary-color'>Submit Your Tool</h3>
+        <h3 className='pb-3 text-xl font-medium text-primary-color'>Submit Your Tool</h3>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto'
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 max-w-2xl mx-auto'
         >
             {
                 submitToolButtons.map((button: { icon: string, title: string }) => (
@@ -30,7 +30,7 @@ const SubmitToolButton = ({ icon, title }: { icon: string, title: string }) => {
                 font-medium text-sm p-4 border border-border-color cursor-pointer hover:bg-secondary-bg hover:text-primary-color'
         >
             <span className='material-symbols-outlined'>{icon}</span>
-            <h3 className=''>{title}</h3>
+            <h3 className='font-bold text-base'>{title}</h3>
         </button>
     )
 }

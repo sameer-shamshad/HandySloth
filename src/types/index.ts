@@ -1,3 +1,11 @@
+export interface CategoryStats {
+  id: string;
+  name: string;
+  tools: number;
+  votes: number;
+  saved: number;
+}
+
 export interface ToolLink {
   label: string;
   url: string;

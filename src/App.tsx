@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import { ToolsProvider } from './context/ToolsProvider';
-import { HomePage, ContactPage, PopularPage, TrendingPage, SubmitToolPage, NotFoundPage, CategoriesPage, DashboardPage } from './pages';
+import { HomePage, ContactPage, PopularPage, TrendingPage, SubmitToolPage, NotFoundPage, CategoriesPage, DashboardPage, ToolViewPage } from './pages';
 
 const App = () => {
   return (
@@ -15,6 +15,7 @@ const App = () => {
           <Route path='/category' element={<CategoriesPage />} />
           <Route path='/submit' element={<SubmitToolPage />} />
           <Route path='/contact' element={<ContactPage />} />
+          <Route path='/tool/:id' element={<ToolViewPage />} />
         </Route>
 
         <Route path='/*' element={<NotFoundPage />} />

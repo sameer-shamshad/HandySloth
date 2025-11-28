@@ -1,3 +1,4 @@
+export { default as ToolViewPage } from './ToolView';
 export { default as HomePage } from './Home';
 export { default as ContactPage } from './Contact';
 export { default as PopularPage } from './Popular';

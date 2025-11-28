@@ -8,8 +8,12 @@ export const toolMachine = setup({
   types: {
     context: {} as {
       tools: Tool[];
+      recentTools: Tool[];
+      popularTools: Tool[];
+      trendingTools: Tool[];
     },
     events: {} as
+      | { type: 'FETCH_TOOLS'; tools: Tool[] }
       | { type: 'ADD_TOOL'; tool: Tool }
       | { type: 'UPDATE_TOOL'; tool: Tool }
       | { type: 'DELETE_TOOL'; id: string }
@@ -17,6 +21,17 @@ export const toolMachine = setup({
       | { type: 'INCREMENT_CLICK'; id: string },
   },
   actions: {
+    fetchTools: assign(({ context, event }) => {
+      console.log('fetchTools', event, context);
+      if (event.type !== 'FETCH_TOOLS') return context;
+
+      return {
+        tools: event.tools,
+        recentTools: selectRecentTools(event.tools),
+        popularTools: selectPopularTools(event.tools),
+        trendingTools: selectTrendingTools(event.tools),
+      };
+    }),
     addTool: assign(({ context, event }) => {
       if (event.type !== 'ADD_TOOL') return context;
       return {
@@ -25,30 +40,57 @@ export const toolMachine = setup({
     }),
     updateTool: assign(({ context, event }) => {
       if (event.type !== 'UPDATE_TOOL') return context;
+
+      const toolToUpdate = context.tools.find((tool) => tool.id === event.tool.id);
+      if (!toolToUpdate) return context;
+
+      const updatedTool = { ...toolToUpdate, ...event.tool };
       return {
-        tools: context.tools.map((tool) => (tool.id === event.tool.id ? event.tool : tool)),
+        tools: context.tools.map((tool) => tool.id === event.tool.id ? updatedTool : tool),
+        recentTools: context.recentTools.map((tool) => tool.id === event.tool.id ? updatedTool : tool),
+        popularTools: context.popularTools.map((tool) => tool.id === event.tool.id ? updatedTool : tool),
+        trendingTools: context.trendingTools.map((tool) => tool.id === event.tool.id ? updatedTool : tool),
       };
     }),
     deleteTool: assign(({ context, event }) => {
       if (event.type !== 'DELETE_TOOL') return context;
+
+      const toolToDelete = context.tools.find((tool) => tool.id === event.id);
+      if (!toolToDelete) return context;
+
       return {
         tools: context.tools.filter((tool) => tool.id !== event.id),
+        recentTools: context.recentTools.filter((tool) => tool.id !== toolToDelete.id),
+        popularTools: context.popularTools.filter((tool) => tool.id !== toolToDelete.id),
+        trendingTools: context.trendingTools.filter((tool) => tool.id !== toolToDelete.id),
       };
     }),
     incrementView: assign(({ context, event }) => {
       if (event.type !== 'INCREMENT_VIEW') return context;
+
+      const toolToUpdate = context.tools.find((tool) => tool.id === event.id);
+      if (!toolToUpdate) return context;
+
+      const updatedTool = { ...toolToUpdate, views: toolToUpdate.views + 1 };
       return {
-        tools: context.tools.map((tool) =>
-          tool.id === event.id ? { ...tool, views: tool.views + 1 } : tool,
-        ),
+        tools: context.tools.map((tool) => tool.id === event.id ? updatedTool : tool),
+        recentTools: context.recentTools.map((tool) => tool.id === event.id ? updatedTool : tool),
+        popularTools: context.popularTools.map((tool) => tool.id === event.id ? updatedTool : tool),
+        trendingTools: context.trendingTools.map((tool) => tool.id === event.id ? updatedTool : tool),
       };
     }),
     incrementClick: assign(({ context, event }) => {
       if (event.type !== 'INCREMENT_CLICK') return context;
+
+      const toolToUpdate = context.tools.find((tool) => tool.id === event.id);
+      if (!toolToUpdate) return context;
+
+      const updatedTool = { ...toolToUpdate, clicks: toolToUpdate.clicks + 1 };
       return {
-        tools: context.tools.map((tool) =>
-          tool.id === event.id ? { ...tool, clicks: tool.clicks + 1 } : tool,
-        ),
+        tools: context.tools.map((tool) => tool.id === event.id ? updatedTool : tool),
+        recentTools: context.recentTools.map((tool) => tool.id === event.id ? updatedTool : tool),
+        popularTools: context.popularTools.map((tool) => tool.id === event.id ? updatedTool : tool),
+        trendingTools: context.trendingTools.map((tool) => tool.id === event.id ? updatedTool : tool),
       };
     }),
   },

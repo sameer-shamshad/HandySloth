@@ -1,11 +1,11 @@
-import { useMachine } from '@xstate/react';
 import ToolsGrid from '../components/Tools/ToolsGrid';
-import { selectTrendingTools, toolMachine } from '../machines/ToolMachine';
+import { selectTrendingTools } from '../machines/ToolMachine';
 import type { Tool } from '../types';
+import { useTools } from '../context/ToolsProvider';
 
 
 const TrendingPage = () => {
-    const [state] = useMachine(toolMachine);
+    const { state } = useTools();
     const tools = state.context.tools;
     const trendingTools: Tool[] = selectTrendingTools(tools, 20);
 

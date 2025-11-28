@@ -1,6 +1,14 @@
 import type { Tool } from '../types';
-import { assign, setup } from 'xstate';
+import { assign, setup, fromPromise } from 'xstate';
 import { fetchToolsMock } from '../services/toolsService';
+
+const sortBy = (tools: Tool[], key: 'views' | 'clicks') => [...tools].sort((a, b) => b[key] - a[key]);
+
+export const selectTrendingTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
+export const selectPopularTools = (tools: Tool[], limit = 5) => sortBy(tools, 'clicks').slice(0, limit);
+export const selectRecentTools = (tools: Tool[], limit = 5) => [...tools].sort((a, b) => {
+  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+}).slice(0, limit);
 
 export const toolMachine = setup({
   types: {
@@ -18,12 +26,19 @@ export const toolMachine = setup({
       | { type: 'INCREMENT_VIEW'; id: string }
       | { type: 'INCREMENT_CLICK'; id: string },
   },
+  actors: {
+    fetchTools: fromPromise(() => fetchToolsMock()),
+  },
   actions: {
-    loadTools: ({ self }) => {
-      fetchToolsMock().then((tools) => {
-        self.send({ type: 'FETCH_TOOLS', tools });
-      });
-    },
+    assignFetchedTools: assign(({ event }) => {
+      const tools = (event as unknown as { output: Tool[] }).output;
+      return {
+        tools,
+        recentTools: selectRecentTools(tools),
+        popularTools: selectPopularTools(tools),
+        trendingTools: selectTrendingTools(tools),
+      };
+    }),
     fetchTools: assign(({ context, event }) => {
       console.log('fetchTools', event, context);
       if (event.type !== 'FETCH_TOOLS') return context;
@@ -108,11 +123,11 @@ export const toolMachine = setup({
   },
   states: {
     loading: {
-      entry: 'loadTools',
-      on: {
-        FETCH_TOOLS: {
+      invoke: {
+        src: 'fetchTools',
+        onDone: {
           target: 'idle',
-          actions: 'fetchTools',
+          actions: 'assignFetchedTools',
         },
       },
     },
@@ -128,11 +143,3 @@ export const toolMachine = setup({
     },
   },
 });
-
-const sortBy = (tools: Tool[], key: 'views' | 'clicks') => [...tools].sort((a, b) => b[key] - a[key]);
-
-export const selectTrendingTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
-export const selectPopularTools = (tools: Tool[], limit = 5) => sortBy(tools, 'clicks').slice(0, limit);
-export const selectRecentTools = (tools: Tool[], limit = 5) => [...tools].sort((a, b) => {
-  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-}).slice(0, limit);

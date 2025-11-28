@@ -12,6 +12,7 @@ export interface Tool {
   clicks: number;
   views: number;
   createdAt: string;
+  bookmarks: [];
   logo: string;
   links: ToolLink[];
 }

@@ -1,9 +1,9 @@
-import { useMachine } from '@xstate/react';
 import ToolsOverviewList from './ToolsOverviewList';
-import { toolMachine, selectTrendingTools, selectPopularTools, selectRecentTools } from '../../machines/ToolMachine';
+import { selectTrendingTools, selectPopularTools, selectRecentTools } from '../../machines/ToolMachine';
+import { useTools } from '../../context/ToolsProvider';
 
 const ToolsOverview = () => {
-  const [state] = useMachine(toolMachine);
+  const { state } = useTools();
   const tools = state.context.tools;
 
   const trendingTools = selectTrendingTools(tools);

@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom';
+
 const submitToolButtons = [
-    { icon: 'add', title: 'Submit Tool' },
-    { icon: 'star', title: 'Get Featured' },
-    { icon: 'campaign', title: 'Custom Compaign' },
-    { icon: 'handshake', title: 'Sponsorship' },
+    { icon: 'add', title: 'Submit Tool' , path: '/submit/create-tool' },
+    { icon: 'star', title: 'Get Featured' , path: '/submit/get-featured' },
+    { icon: 'campaign', title: 'Custom Compaign' , path: '/submit/custom-campaign' },
+    { icon: 'handshake', title: 'Sponsorship' , path: '/submit/sponsorship' },
 ]
 
 const SubmitToolPage = () => {
@@ -13,8 +15,8 @@ const SubmitToolPage = () => {
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 max-w-2xl mx-auto'
         >
             {
-                submitToolButtons.map((button: { icon: string, title: string }) => (
-                    <SubmitToolButton key={button.title} icon={button.icon} title={button.title} />
+                submitToolButtons.map((button: { icon: string, title: string, path: string }) => (
+                    <SubmitToolButton key={button.title} icon={button.icon} path={button.path} title={button.title} />
                 ))
             }
         </div>
@@ -22,10 +24,12 @@ const SubmitToolPage = () => {
   );
 };
 
-const SubmitToolButton = ({ icon, title }: { icon: string, title: string }) => {
+const SubmitToolButton = ({ icon, title, path = '/' }: { icon: string, title: string, path: string }) => {
+    const navigate = useNavigate();
     return (
         <button 
             type="button"
+            onClick={() => navigate(path)}
             className='gap-2! flex-col h-30! lg:h-35! w-full! rounded-lg bg-primary-bg text-primary-color 
                 font-medium text-sm p-4 border border-border-color cursor-pointer hover:bg-secondary-bg hover:text-primary-color'
         >

@@ -6,24 +6,53 @@ export interface CategoryStats {
   saved: number;
 }
 
-export interface ToolLink {
-  label: string;
+export interface ToolSocialLink {
+  label: "Website" | "Telegram" | "X";
   url: string;
 }
 
+export type ToolCategory = '' 
+  | 'Data Analytics'
+  | 'AI Tools'
+  | 'Development' 
+  | 'Design' 
+  | 'Marketing' 
+  | 'Productivity' 
+  | 'Social Media' 
+  | 'Content Creation' 
+  | 'E-commerce' 
+  | 'Other';
+
+export type ToolTag = 'Free' 
+  | 'Paid' 
+  | 'Open Source' 
+  | 'Web-based' 
+  | 'Desktop' 
+  | 'Mobile' 
+  | 'API' 
+  | 'Plugin' 
+  | 'No Signup' 
+  | 'Cloud' 
+  | 'Self-hosted' 
+  | 'AI Powered';
+
 export interface Tool {
-  id: string;
+  _id: string;
   name: string;
-  description: string;
-  category: string;
-  tags: string[];
+  shortDescription?: string;
+  fullDetail?: string;
+  toolImages?: string[];
+  category: ToolCategory;
+  tags: ToolTag[];
   clicks: number;
   views: number;
   createdAt: string;
-  bookmarks: [];
-  logo: string;
-  links: ToolLink[];
+  bookmarks: number;
+  logo?: string;
+  links: ToolSocialLink[];
 }
+
+export type NewTool = Omit<Tool, '_id' | 'clicks' | 'views' | 'createdAt' | 'bookmarks' | 'logo'>;
 
 export type Contact = {
   firstName: string;

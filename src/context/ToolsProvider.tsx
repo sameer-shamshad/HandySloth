@@ -17,9 +17,14 @@ export const ToolsProvider = ({ children }: { children: ReactNode }) => {
         return { state, send };
     }, [state, send]);
 
-  return <ToolsContext.Provider value={value}>{children}</ToolsContext.Provider>;
+  return (
+    <ToolsContext.Provider value={value}>
+      {children}
+    </ToolsContext.Provider>
+  );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTools = (): ToolsContextValue => {
   const context = useContext(ToolsContext);
   if (!context) {

@@ -9,7 +9,9 @@ const initialNewTool: NewTool = {
   fullDetail: '',
   toolImages: [],
   tags: [],
-  links: [],
+  links: [
+    
+  ],
 };
 
 const sortBy = (tools: Tool[], key: 'views' | 'clicks') => [...tools].sort((a, b) => b[key] - a[key]);

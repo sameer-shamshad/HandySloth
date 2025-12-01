@@ -68,6 +68,7 @@ const ContactPage = () => {
             <textarea 
                 rows={5}
                 required
+                className='resize-none'
                 placeholder='Message' 
                 value={state.context.message}
                 onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'message', value: e.target.value })}
@@ -109,7 +110,7 @@ const ContactPage = () => {
 
             <button 
                 type='submit'
-                className='w-full! bg-white! text-black! px-4 py-2 rounded-lg mt-2'
+                className='w-full! py-2! bg-white! text-black! px-4! rounded-lg mt-2'
             >Send Message</button>
         </form>
     </div>

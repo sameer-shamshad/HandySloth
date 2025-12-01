@@ -20,7 +20,7 @@ const ToolsGrid = ({ tools, tag }: ToolsGridProps) => {
                     ))
                 ) : machineState === 'idle' ? (
                     tools?.length > 0 ? tools.map((tool, index) => (
-                        <ToolCard key={tool.id} tool={tool} tag={tag === 'NEW' ? tag : `#${index + 1 > 3 ? index + 1 : `${index + 1}🔥`}`} />
+                        <ToolCard key={tool._id} tool={tool} tag={tag === 'NEW' ? tag : `#${index + 1 > 3 ? index + 1 : `${index + 1}🔥`}`} />
                     )) : (
                         <p className='w-full text-center text-gray-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>No tools found</p>
                     )

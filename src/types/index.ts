@@ -6,11 +6,6 @@ export interface CategoryStats {
   saved: number;
 }
 
-export interface ToolSocialLink {
-  label: "Website" | "Telegram" | "X";
-  url: string;
-}
-
 export interface SocialLinks {
   telegram: string;
   x: string;
@@ -55,12 +50,10 @@ export interface Tool {
   createdAt: string;
   bookmarks: number;
   logo?: string;
-  links: ToolSocialLink[];
+  links: SocialLinks;
 }
 
-export type NewTool = Omit<Tool, '_id' | 'clicks' | 'views' | 'createdAt' | 'bookmarks' | 'logo' | 'links'> & {
-  links: SocialLinks;
-};
+export type NewTool = Omit<Tool, '_id' | 'clicks' | 'views' | 'createdAt' | 'bookmarks' | 'logo'>;
 
 export type Contact = {
   firstName: string;

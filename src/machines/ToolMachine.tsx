@@ -45,33 +45,7 @@ export const toolMachine = setup({
   },
   actors: {
     fetchTools: fromPromise(() => fetchToolsMock()),
-    createTool: fromPromise(({ input }) => {
-      const newTool = input as NewTool;
-      // Convert social links object to array format for Tool type
-      // Order: Telegram (index 0), X (index 1), Website (index 3)
-      const linksArray: Array<{ label: "Telegram" | "X" | "Website"; url: string }> = [];
-      
-      if (newTool.links.telegram) {
-        linksArray[0] = { label: 'Telegram', url: newTool.links.telegram };
-      }
-      if (newTool.links.x) {
-        linksArray[1] = { label: 'X', url: newTool.links.x };
-      }
-      if (newTool.links.website) {
-        linksArray[3] = { label: 'Website', url: newTool.links.website };
-      }
-      
-      // Convert sparse array to dense array (remove undefined slots but preserve order)
-      // This ensures Telegram is first, X is second, Website is last (or at index 3 if array is sparse)
-      const finalLinksArray = Array.from({ length: 4 }, (_, i) => linksArray[i]).filter(link => link !== undefined);
-      
-      // Create a Tool-like object (with array links) for the service
-      const toolForApi = {
-        ...newTool,
-        links: finalLinksArray,
-      } as Omit<NewTool, 'links'> & { links: typeof linksArray };
-      return createToolMock(toolForApi as unknown as NewTool);
-    }),
+    createTool: fromPromise(({ input }) => createToolMock(input as NewTool)),
   },
   actions: {
     assignFetchedTools: assign(({ event }) => {

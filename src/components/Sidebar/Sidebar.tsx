@@ -105,20 +105,20 @@ const Sidebar = () => {
         "
       >
         <button
-          className="flex-1"
-          onClick={() => {
-            console.log('Connect clicked');
-          }}
+          type="button"
+          className="flex items-center justify-center gap-2 py-2!"
+          onClick={() => { console.log('Connect clicked') }}
         >
           <span className="material-symbols-outlined">network_node</span>
           <span>Connect</span>
         </button>
 
           <button
-            className="rounded-lg"
+            type="button"
+            className="rounded-lg! p-2!"
             onClick={() => send({ type: 'TOGGLE_SETTINGS' })}
           >
-            <span className="material-symbols-outlined text-[20px]!">settings</span>
+            <span className="material-symbols-outlined text-[20px]! align-middle">settings</span>
           </button>
           {
             isSettingsOpen && (

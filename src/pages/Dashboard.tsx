@@ -77,7 +77,7 @@ const DashboardPage = () => {
 
             <div className='flex items-center gap-2 mt-2'>
                 {
-                    Array.from({ length: 5 }).map((_, index) => (
+                    Array.from({ length: 5 }).map(() => (
                         <span className='material-symbols-outlined'>star</span>
                     ))
                 }

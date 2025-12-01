@@ -7,13 +7,16 @@ type AttachImagesProps = {
   onChange: (nextImages: string[]) => void;
 };
 
+const MAX_IMAGES = 5;
+
 const AttachImages: React.FC<AttachImagesProps> = ({ images, onChange, label = 'Attach Images', placeholder = 'https://example.com/image.png' }) => {
   const [url, setUrl] = useState('');
   const trimmedUrl = url.trim();
-  const canAdd = trimmedUrl.length > 0;
+  const isAtLimit = images.length >= MAX_IMAGES;
+  const canAdd = trimmedUrl.length > 0 && !isAtLimit;
 
   const handleAdd = () => {
-    if (!canAdd) return;
+    if (!canAdd || isAtLimit) return;
     onChange([...images, trimmedUrl]);
     setUrl('');
   };
@@ -24,24 +27,35 @@ const AttachImages: React.FC<AttachImagesProps> = ({ images, onChange, label = '
 
   return (
     <div className="flex flex-col gap-3 text-primary-color">
-      <label className="font-medium text-sm">{label}</label>
+      <div className="flex items-center justify-between">
+        <label className="font-medium text-sm">{label}</label>
+        <span className="text-xs text-secondary-color">
+          {images.length}/{MAX_IMAGES} images
+        </span>
+      </div>
       <div className="flex gap-2">
         <input
           type="text"
           value={url}
           onChange={(event) => setUrl(event.target.value)}
-          placeholder={placeholder}
-          className="flex-1 rounded-md border border-border-color bg-primary-bg px-3 py-2 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color"
+          placeholder={isAtLimit ? `Maximum ${MAX_IMAGES} images allowed` : placeholder}
+          disabled={isAtLimit}
+          className="flex-1 rounded-md border border-border-color bg-primary-bg px-3 py-2 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color disabled:opacity-50 disabled:cursor-not-allowed"
         />
         <button
           type="button"
           disabled={!canAdd}
           onClick={handleAdd}
-          className="rounded-md disabled:bg-secondary-bg! bg-main-color! px-4 py-2 text-sm font-semibold text-black-color!"
+          className="rounded-md disabled:bg-secondary-bg! disabled:text-secondary-color! disabled:cursor-not-allowed bg-main-color! px-4 py-2! text-sm font-semibold text-black-color!"
         >
           Add
         </button>
       </div>
+      {isAtLimit && (
+        <p className="text-xs text-secondary-color">
+          Maximum {MAX_IMAGES} images allowed. Remove an image to add a new one.
+        </p>
+      )}
 
       <div className="flex flex-col rounded-md overflow-hidden">
         {
@@ -75,7 +89,7 @@ const AttachedImageInstance = memo(({ imageUrl, index, handleRemove }: AttachedI
       <button
         type="button"
         onClick={() => handleRemove(index)}
-        className="h-7! text-xs! font-bold! bg-main-color! text-black-color! ml-auto"
+        className="px-3! py-1! text-xs! font-bold! bg-red-500! text-white! ml-auto"
       >
         Delete
       </button>

@@ -1,6 +1,6 @@
 import "bootstrap";
 import { useState, memo } from 'react';
-import type { Tool, ToolSocialLink } from '../../types';
+import type { Tool } from '../../types';
 
 const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
@@ -16,7 +16,7 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
         <div>
           <p className="text-base font-semibold text-primary-color">{tool.name}</p>
           <p className="text-[11px] uppercase tracking-wide text-secondary-color mt-1">{tool.category}</p>
-          <p className="text-xs text-secondary-color font-maven-pro my-1">{tool.description}</p>
+          <p className="text-xs text-secondary-color font-maven-pro my-1">{tool.shortDescription}</p>
         </div>
         <span className="absolute -top-3 left-0 rounded-md bg-main-color w-14 text-center py-1 text-sm font-medium text-black-color">
           {tag}
@@ -41,18 +41,20 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
       </div>
 
       <div className="grid grid-cols-3 gap-3 text-xs font-medium mt-auto">
-        {
-            tool.links.map((link: ToolSocialLink) => (
-              <a
-                  href={link.url}
-                  key={link.label}
-                  className={`w-full font-extralight! flex-1 text-center rounded-full shadow-[0_0_90px_0.1px_#A9ECEC] dark:shadow-none border-2 border-main-color dark:border-none px-4 lg:px-2 py-1 md:py-2 bg-primary-bg 
-                  text-primary-color drop-shadow-sm shadow-main-color${link.url === '' ? ' pointer-events-none opacity-100' : ''}`}
-              >
-                  {link.label}
-              </a>
-            ))
-        }
+        {[
+          { label: 'Telegram', url: tool.links.telegram },
+          { label: 'X', url: tool.links.x },
+          { label: 'Website', url: tool.links.website },
+        ].map((link) => (
+          <a
+            href={link.url}
+            key={link.label}
+            className={`w-full font-extralight! flex-1 text-center rounded-full shadow-[0_0_90px_0.1px_#A9ECEC] dark:shadow-none border-2 border-main-color dark:border-none px-4 lg:px-2 py-1 md:py-2 bg-primary-bg 
+            text-primary-color drop-shadow-sm shadow-main-color${link.url === '' ? ' pointer-events-none opacity-100' : ''}`}
+          >
+            {link.label}
+          </a>
+        ))}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ const ToolsOverviewList = ({ tools = [], toolsLabel = "" }: { tools: Tool[], too
 
             {
                 tools?.length > 0 && tools.map((tool, index) => (
-                        <div key={tool.id} className='flex items-center gap-3 py-3 border-b border-border-color'>
+                        <div key={tool._id} className='flex items-center gap-3 py-3 border-b border-border-color'>
                             <span className='text-xs font-semibold text-primary-color px-2 py-1'>{index + 1}</span>
                             <div className='flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-4 xl:ml-6 xl:gap-5'>
                                 <img src={tool.logo} alt={tool.name} className='h-6 w-6 md:h-8 md:w-8 lg:h-9 lg:w-9 rounded-full object-cover' />

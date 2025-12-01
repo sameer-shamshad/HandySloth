@@ -199,7 +199,7 @@ const CreateToolPage = () => {
 
             <button
                 type="submit"
-                className="mt-5 w-full! lg:w-md! mx-auto rounded-md! bg-main-color! text-center text-base font-extrabold! text-black-color!"
+                className="mt-5 py-2! w-full! lg:w-md! mx-auto rounded-md! bg-main-color! text-center text-base font-extrabold! text-black-color!"
             >Submit Tool</button>
             </form>
         </section>

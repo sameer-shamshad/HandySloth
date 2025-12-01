@@ -20,7 +20,7 @@ const ToolList = ({ tools, label }: ToolListProps) => {
                     >
                         <span className='text-secondary-color text-xs ml-4'>{index + 1}</span>
                         <img 
-                            src={tool.logo || "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg"} 
+                            src={tool?.logo || "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg"} 
                             alt={tool.name} 
                             className='w-7 h-7 md:w-10 md:h-10 rounded-full object-contain ml-10'
                         />

@@ -72,14 +72,8 @@ body {
 }
 
 button {
-  height: 40px;
-  min-width: 40px;
-  width: max-content;
   gap: 10px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 3px 10px;
   border-radius: 8px;
   background-color: var(--primary-bg);
   color: var(--primary-color);

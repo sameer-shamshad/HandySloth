@@ -8,7 +8,7 @@ const ToolViewPage = () => {
     const { id } = useParams();
     const { state } = useTools();
     const tools = state.context.tools;
-    const tool = tools.find((tool: Tool) => tool.id === id);
+    const tool = tools.find((tool: Tool) => tool._id === id);
     
     const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 
@@ -16,9 +16,9 @@ const ToolViewPage = () => {
         setIsBookmarked(prev => !prev);
     };
 
-    if (!tool) {
-        return <ToolNotFound />;
-    }
+    // if (!tool) {
+    //     return <ToolNotFound />;
+    // }
 
     return (
         <div className='flex flex-col gap-6'>
@@ -42,24 +42,31 @@ const ToolViewPage = () => {
                         className='w-12 h-12 rounded-xl object-cover text-primary-color'
                     />
                     <div className='flex flex-col gap-2'>
-                        <h3 className='text-lg font-bold text-primary-color text-wrap'>{tool?.name || "Open AI" || "The Coin Perspective"}</h3>
-                        <p className='text-sm text-secondary-color -mt-2'>{tool?.description || "Tool Description"}</p>
+                        <h3 className='text-lg font-bold text-primary-color text-wrap'>{tool?.name || "Open AI"}</h3>
+                        <p className='text-sm text-secondary-color -mt-2'>{tool?.shortDescription || "Tool Description"}</p>
                     </div>
 
                     <div className='flex items-center gap-0 ml-auto *:w-8! *:h-8! *:min-w-8! *:min-h-8!'>
-                        {
-                            ['telegram', 'X', 'website'].map((social, index) => (
-                                <a key={index} className='w-10 h-10 flex items-center justify-center rounded-full border border-primary-color text-primary-color!'>
-                                    {
-                                        socialIcons[social as keyof typeof socialIcons]
-                                    }
-                                </a>
-                            ))
-                        }
+                        {tool?.links.telegram && (
+                            <a href={tool.links.telegram} className='p-2 rounded-full border border-primary-color text-primary-color!'>
+                                {socialIcons.telegram}
+                            </a>
+                        )}
+                        {tool?.links.x && (
+                            <a href={tool.links.x} className='w-10 h-10 flex items-center justify-center rounded-full border border-primary-color text-primary-color!'>
+                                {socialIcons.X}
+                            </a>
+                        )}
+                        {tool?.links.website && (
+                            <a href={tool.links.website} className='w-10 h-10 flex items-center justify-center rounded-full border border-primary-color text-primary-color!'>
+                                {socialIcons.website}
+                            </a>
+                        )}
 
-                        <button 
+                        <button
+                            type='button'
                             onClick={handleBookmark}
-                            className='w-10! h-10! rounded-full! border'
+                            className='p-2! rounded-full! border'
                         >
                             {
                                 isBookmarked ? (

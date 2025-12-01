@@ -14,11 +14,11 @@ export const tools: Tool[] = [
     bookmarks: 125,
     logo: 'https://placehold.co/64x64?text=C',
     toolImages: ['https://placehold.co/800x400?text=Crypto+Calendar'],
-    links: [
-      { label: 'Telegram', url: 'https://t.me/coindar' },
-      { label: 'X', url: 'https://twitter.com/coindar' },
-      { label: 'Website', url: 'https://coindar.org' },
-    ],
+    links: {
+      telegram: 'https://t.me/coindar',
+      x: 'https://twitter.com/coindar',
+      website: 'https://coindar.org',
+    },
   },
   {
     _id: 'coin360',
@@ -33,11 +33,11 @@ export const tools: Tool[] = [
     bookmarks: 180,
     logo: 'https://placehold.co/64x64?text=C3',
     toolImages: ['https://placehold.co/800x400?text=Coin360+Heatmap'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: 'https://twitter.com/coin360' },
-      { label: 'Website', url: 'https://coin360.com' },
-    ],
+    links: {
+      telegram: '',
+      x: 'https://twitter.com/coin360',
+      website: 'https://coin360.com',
+    },
   },
   {
     _id: 'cryptoPanic',
@@ -52,11 +52,11 @@ export const tools: Tool[] = [
     bookmarks: 210,
     logo: 'https://placehold.co/64x64?text=CP',
     toolImages: ['https://placehold.co/800x400?text=CryptoPanic+News'],
-    links: [
-      { label: 'Telegram', url: 'https://t.me/cryptopanic' },
-      { label: 'X', url: 'https://twitter.com/cryptopanic' },
-      { label: 'Website', url: 'https://cryptopanic.com' },
-    ],
+    links: {
+      telegram: 'https://t.me/cryptopanic',
+      x: 'https://twitter.com/cryptopanic',
+      website: 'https://cryptopanic.com',
+    },
   },
   {
     _id: 'cryptoMiso',
@@ -71,11 +71,11 @@ export const tools: Tool[] = [
     bookmarks: 45,
     logo: 'https://placehold.co/64x64?text=CM',
     toolImages: ['https://placehold.co/800x400?text=CryptoMiso'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: '' },
-      { label: 'Website', url: 'https://cryptomiso.com' },
-    ],
+    links: {
+      telegram: '',
+      x: '',
+      website: 'https://cryptomiso.com',
+    },
   },
   {
     _id: 'coinPerspective',
@@ -90,11 +90,11 @@ export const tools: Tool[] = [
     bookmarks: 95,
     logo: 'https://placehold.co/64x64?text=TCP',
     toolImages: ['https://placehold.co/800x400?text=Coin+Perspective'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: '' },
-      { label: 'Website', url: 'https://coinperspective.com' },
-    ],
+    links: {
+      telegram: '',
+      x: '',
+      website: 'https://coinperspective.com',
+    },
   },
   {
     _id: 'dexGuru',
@@ -109,11 +109,11 @@ export const tools: Tool[] = [
     bookmarks: 165,
     logo: 'https://placehold.co/64x64?text=DG',
     toolImages: ['https://placehold.co/800x400?text=DexGuru'],
-    links: [
-      { label: 'Telegram', url: 'https://t.me/dexguru' },
-      { label: 'X', url: '' },
-      { label: 'Website', url: 'https://dexguru.com' },
-    ],
+    links: {
+      telegram: 'https://t.me/dexguru',
+      x: '',
+      website: 'https://dexguru.com',
+    },
   },
   {
     _id: 'defiLlama',
@@ -128,11 +128,11 @@ export const tools: Tool[] = [
     bookmarks: 320,
     logo: 'https://placehold.co/64x64?text=DL',
     toolImages: ['https://placehold.co/800x400?text=DefiLlama'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: 'https://twitter.com/defillama' },
-      { label: 'Website', url: 'https://defillama.com' },
-    ],
+    links: {
+      telegram: '',
+      x: 'https://twitter.com/defillama',
+      website: 'https://defillama.com',
+    },
   },
   {
     _id: 'tokenTerminal',
@@ -147,11 +147,11 @@ export const tools: Tool[] = [
     bookmarks: 140,
     logo: 'https://placehold.co/64x64?text=TT',
     toolImages: ['https://placehold.co/800x400?text=Token+Terminal'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: '' },
-      { label: 'Website', url: 'https://tokenterminal.com' },
-    ],
+    links: {
+      telegram: '',
+      x: '',
+      website: 'https://tokenterminal.com',
+    },
   },
   {
     _id: 'nansen',
@@ -166,11 +166,11 @@ export const tools: Tool[] = [
     bookmarks: 450,
     logo: 'https://placehold.co/64x64?text=N',
     toolImages: ['https://placehold.co/800x400?text=Nansen'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: 'https://twitter.com/nansen_ai' },
-      { label: 'Website', url: 'https://nansen.ai' },
-    ],
+    links: {
+      telegram: '',
+      x: 'https://twitter.com/nansen_ai',
+      website: 'https://nansen.ai',
+    },
   },
   {
     _id: 'metamask',
@@ -185,11 +185,11 @@ export const tools: Tool[] = [
     bookmarks: 2800,
     logo: 'https://placehold.co/64x64?text=MM',
     toolImages: ['https://placehold.co/800x400?text=MetaMask'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: 'https://twitter.com/metamask' },
-      { label: 'Website', url: 'https://metamask.io' },
-    ],
+    links: {
+      telegram: '',
+      x: 'https://twitter.com/metamask',
+      website: 'https://metamask.io',
+    },
   },
   {
     _id: 'opensea',
@@ -204,11 +204,11 @@ export const tools: Tool[] = [
     bookmarks: 1520,
     logo: 'https://placehold.co/64x64?text=OS',
     toolImages: ['https://placehold.co/800x400?text=OpenSea'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: 'https://twitter.com/opensea' },
-      { label: 'Website', url: 'https://opensea.io' },
-    ],
+    links: {
+      telegram: '',
+      x: 'https://twitter.com/opensea',
+      website: 'https://opensea.io',
+    },
   },
   {
     _id: 'etherscan',
@@ -223,11 +223,11 @@ export const tools: Tool[] = [
     bookmarks: 2100,
     logo: 'https://placehold.co/64x64?text=ES',
     toolImages: ['https://placehold.co/800x400?text=Etherscan'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: '' },
-      { label: 'Website', url: 'https://etherscan.io' },
-    ],
+    links: {
+      telegram: '',
+      x: '',
+      website: 'https://etherscan.io',
+    },
   },
   {
     _id: 'uniswap',
@@ -242,11 +242,11 @@ export const tools: Tool[] = [
     bookmarks: 3400,
     logo: 'https://placehold.co/64x64?text=UNI',
     toolImages: ['https://placehold.co/800x400?text=Uniswap'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: 'https://twitter.com/uniswap' },
-      { label: 'Website', url: 'https://uniswap.org' },
-    ],
+    links: {
+      telegram: '',
+      x: 'https://twitter.com/uniswap',
+      website: 'https://uniswap.org',
+    },
   },
   {
     _id: 'certik',
@@ -261,11 +261,11 @@ export const tools: Tool[] = [
     bookmarks: 88,
     logo: 'https://placehold.co/64x64?text=CK',
     toolImages: ['https://placehold.co/800x400?text=CertiK'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: 'https://twitter.com/certikorg' },
-      { label: 'Website', url: 'https://certik.com' },
-    ],
+    links: {
+      telegram: '',
+      x: 'https://twitter.com/certikorg',
+      website: 'https://certik.com',
+    },
   },
   {
     _id: 'glassnode',
@@ -280,10 +280,10 @@ export const tools: Tool[] = [
     bookmarks: 275,
     logo: 'https://placehold.co/64x64?text=GN',
     toolImages: ['https://placehold.co/800x400?text=Glassnode'],
-    links: [
-      { label: 'Telegram', url: '' },
-      { label: 'X', url: '' },
-      { label: 'Website', url: 'https://glassnode.com' },
-    ],
+    links: {
+      telegram: '',
+      x: '',
+      website: 'https://glassnode.com',
+    },
   },
 ];

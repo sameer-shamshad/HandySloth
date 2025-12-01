@@ -5,6 +5,7 @@ import ToolImage from "../assets/tool-image.png";
 import { useTools } from "../context/ToolsProvider";
 import ToolNotFound from "../components/Tools/ToolNotFound";
 import ToolDetailedCard from "../components/Tools/ToolDetailedCard";
+import ToolCommunityRatings from "../components/Tools/ToolCommunityRatings";
 
 const ToolViewPage = () => {
   const { id } = useParams();
@@ -183,14 +184,14 @@ const ToolViewPage = () => {
         </p>
       </main>
 
-      <main className="flex flex-col xl:flex-row gap-6 bg-primary-bg px-3 lg:px-6 py-8 rounded-3xl">
+      <main className="flex flex-col xl:flex-row gap-6 bg-primary-bg xl:bg-transparent px-3 lg:px-6 py-8 rounded-3xl">
         <img
           alt="Tool Usage Image"
           src={ToolImage}
           className="w-full h-auto rounded-xl"
         />
 
-        <div className="gap-5 flex flex-col py-6 px-8 xl:px-0">
+        <div className="gap-5 flex flex-col py-6 px-8 xl:bg-primary-bg xl:rounded-3xl xl:px-6 xl:py-12 2xl:px-8">
             <div className="flex flex-col items-center gap-1 bg-group-bg rounded-xl overflow-hidden pt-3">
                 <h4 className="text-sm text-secondary-color font-extralight">
                     Primary Task
@@ -203,7 +204,7 @@ const ToolViewPage = () => {
                     <span className="text-white text-sm">Data Analytics</span>
                 </div>
 
-                <span className="w-full py-3 text-xs text-secondary-color text-center font-extralight mt-4 bg-secondary-bg/30">
+                <span className="w-full py-3 text-xs text-secondary-color text-center font-extralight mt-4 bg-gray-500/40 dark:bg-secondary-bg/30">
                     #1 Most Recent
                 </span>
             </div>
@@ -212,16 +213,18 @@ const ToolViewPage = () => {
                 className="gap-x-1 gap-y-2 flex flex-wrap *:rounded-xl *:px-4 *:py-2 *:text-xs 
                 *:text-black-color *:font-extralight *:bg-main-color *:dark:bg-secondary-bg/30 *:dark:text-secondary-color!"
             >
-                {[
-                "Dummy Text here",
-                "Dummy",
-                "Dummy",
-                "Dummy Text",
-                "Dummy Text Here",
-                "Dummy",
-                "Dummy",
-                "Dummy",
-                ].map((text) => (<span key={text}>{text}</span>))}
+                {
+                    [
+                        "Dummy Text here",
+                        "Dummy",
+                        "Dummy",
+                        "Dummy Text",
+                        "Dummy Text Here",
+                        "Dummy",
+                        "Dummy",
+                        "Dummy",
+                    ].map((text) => (<span key={text}>{text}</span>))
+                }
             </div>
 
             <p className="text-sm text-secondary-color font-extralight">
@@ -238,7 +241,7 @@ const ToolViewPage = () => {
 
             <div className="flex flex-col gap-4 [&>button]:flex [&>button]:items-center [&>button]:gap-2 [&>button]:bg-main-color! 
                 [&>button]:dark:bg-secondary-bg/30! [&>button]:text-primary-color! [&>button]:dark:text-secondary-color! 
-                [&>button]:rounded-xl! [&>button]:px-5! [&>button]:py-3! [&>button]:text-sm! [&>button]:font-medium!"
+                [&>button]:rounded-xl! [&>button]:px-5! [&>button]:py-3! [&>button]:text-sm! [&>button]:font-medium! dark:[&>button>span]:text-main-color!"
             >
                 <button type="button" >
                     <span className="material-symbols-outlined">lightbulb_2</span>
@@ -260,13 +263,14 @@ const ToolViewPage = () => {
                     and more recently with desktop publishing software like Aldus
                     PageMaker including versions of Lorem Ipsum.
                 </p>
-
             </div>
 
             <button type="button" className="-mb-2 bg-secondary-bg! text-center! py-3!">Visit Website</button>
-            <button type="button" className="-mb-2 bg-main-color! text-center! py-3!">Save</button>
+            <button type="button" className="-mb-2 bg-main-color! text-center! py-3! text-black-color!">Save</button>
         </div>
       </main>
+
+      <ToolCommunityRatings tool={tool} />
     </div>
   );
 };

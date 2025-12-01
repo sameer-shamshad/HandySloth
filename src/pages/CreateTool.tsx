@@ -32,13 +32,11 @@ const TAG_OPTIONS: ToolTag[] = [
   'AI Powered',
 ];
 
-const SOCIAL_FIELDS: ReadonlyArray<{ label: string; name: keyof FormState; placeholder: string; }> = [
-  { label: 'Website', name: 'website', placeholder: 'https://example.com' },
+const SOCIAL_FIELDS: ReadonlyArray<{ label: string; name: 'telegram' | 'x' | 'website'; placeholder: string; }> = [
   { label: 'Telegram', name: 'telegram', placeholder: '@username or https://t.me/username' },
-  { label: 'Twitter / X', name: 'twitter', placeholder: '@username or https://twitter.com/username' },
+  { label: 'Twitter / X', name: 'x', placeholder: '@username or https://twitter.com/username' },
+  { label: 'Website', name: 'website', placeholder: 'https://example.com' },
 ];
-
-type SocialFieldKey = (typeof SOCIAL_FIELDS)[number]['name'];
 
 const inputClassNames = 'mt-2 w-full rounded-md border border-border-color dark:bg-secondary-bg px-3 py-2 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-primary-color';
 
@@ -70,6 +68,17 @@ const CreateToolPage = () => {
     const handleChangeImages = (nextImages: string[]) => {
         send({ type: "CHANGE_FIELD", field: "toolImages", value: nextImages });
     }
+
+    const handleSocialLinkChange = (field: 'telegram' | 'x' | 'website', value: string) => {
+        send({ 
+            type: "CHANGE_FIELD", 
+            field: "links", 
+            value: {
+                ...formData.links,
+                [field]: value,
+            }
+        });
+    };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -166,20 +175,18 @@ const CreateToolPage = () => {
                 </div>
             </div>
 
-            {/* <div className="flex flex-col">
+            <div className="flex flex-col">
                 <label>Social Links (optional)</label>
                 <div className="mt-3 grid gap-2">
                     {
                         SOCIAL_FIELDS.map(({ label, name, placeholder }) => {
-                            const typedName = name as SocialFieldKey;
-
                             return (
                                 <div key={name}>
                                     <label className="hint">{label}</label>
                                     <input
                                         name={name}
-                                        value={formData[typedName]}
-                                        onChange={handleInputChange}
+                                        value={formData.links?.[name] || ''}
+                                        onChange={(e) => handleSocialLinkChange(name, e.target.value)}
                                         className={inputClassNames}
                                         placeholder={placeholder}
                                     />
@@ -188,11 +195,11 @@ const CreateToolPage = () => {
                         })
                     }
                 </div>
-            </div> */}
+            </div>
 
             <button
                 type="submit"
-                className="mt-5 w-full! rounded-md! bg-main-color! text-center text-base font-extrabold! text-black-color!"
+                className="mt-5 w-full! lg:w-md! mx-auto rounded-md! bg-main-color! text-center text-base font-extrabold! text-black-color!"
             >Submit Tool</button>
             </form>
         </section>

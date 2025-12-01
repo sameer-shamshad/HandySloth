@@ -1,6 +1,6 @@
 import "bootstrap";
 import { useState, memo } from 'react';
-import type { Tool, ToolLink } from '../../types';
+import type { Tool, ToolSocialLink } from '../../types';
 
 const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
@@ -40,10 +40,9 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
         </button>
       </div>
 
-
       <div className="grid grid-cols-3 gap-3 text-xs font-medium mt-auto">
         {
-            tool.links.map((link: ToolLink) => (
+            tool.links.map((link: ToolSocialLink) => (
               <a
                   href={link.url}
                   key={link.label}

@@ -11,6 +11,12 @@ export interface ToolSocialLink {
   url: string;
 }
 
+export interface SocialLinks {
+  telegram: string;
+  x: string;
+  website: string;
+}
+
 export type ToolCategory = '' 
   | 'Data Analytics'
   | 'AI Tools'
@@ -52,7 +58,9 @@ export interface Tool {
   links: ToolSocialLink[];
 }
 
-export type NewTool = Omit<Tool, '_id' | 'clicks' | 'views' | 'createdAt' | 'bookmarks' | 'logo'>;
+export type NewTool = Omit<Tool, '_id' | 'clicks' | 'views' | 'createdAt' | 'bookmarks' | 'logo' | 'links'> & {
+  links: SocialLinks;
+};
 
 export type Contact = {
   firstName: string;

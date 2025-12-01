@@ -33,18 +33,17 @@ const AttachImages: React.FC<AttachImagesProps> = ({ images, onChange, label = '
           placeholder={placeholder}
           className="flex-1 rounded-md border border-border-color bg-primary-bg px-3 py-2 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color"
         />
-        {canAdd && (
-          <button
-            type="button"
-            onClick={handleAdd}
-            className="rounded-md bg-main-color px-4 py-2 text-sm font-semibold text-black-color shadow-[0_6px_20px_var(--shadow-color)] transition hover:-translate-y-0.5"
-          >
-            Add
-          </button>
-        )}
+        <button
+          type="button"
+          disabled={!canAdd}
+          onClick={handleAdd}
+          className="rounded-md disabled:bg-secondary-bg! bg-main-color! px-4 py-2 text-sm font-semibold text-black-color!"
+        >
+          Add
+        </button>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col rounded-md overflow-hidden">
         {
           images.map((imageUrl, index) => (
             <AttachedImageInstance 
@@ -69,13 +68,14 @@ interface AttachedImageInstanceProps {
 const AttachedImageInstance = memo(({ imageUrl, index, handleRemove }: AttachedImageInstanceProps) => {
   return (
     <div
-      className="flex items-center justify-between gap-3 rounded-md border border-border-color bg-secondary-bg px-3 py-2 text-sm text-secondary-color"
+      className="flex items-center gap-3 border-b border-border-color bg-secondary-bg px-3 py-3 text-sm text-secondary-color"
     >
+      <span className="truncate pl-2 text-secondary-color">{index + 1}.</span>
       <span className="truncate pl-2 text-primary-color">{imageUrl}</span>
       <button
         type="button"
         onClick={() => handleRemove(index)}
-        className="text-xs font-bold! bg-main-color! text-black-color!"
+        className="h-7! text-xs! font-bold! bg-main-color! text-black-color! ml-auto"
       >
         Delete
       </button>

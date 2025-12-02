@@ -63,8 +63,8 @@ const Sidebar = () => {
 
   return (
     <aside id='sidebar' className="flex items-center justify-between md:flex-col md:h-screen md:w-68
-      bg-primary-bg md:bg-main-color md:dark:bg-primary-bg border-r border-group-bg px-4 py-2 sm:px-6 sm:pb-10
-      2xl:flex-row 2xl:w-full 2xl:h-[80px] 2xl:items-center"
+      bg-primary-bg md:bg-main-color md:dark:bg-primary-bg border-r border-group-bg px-4 py-2 sm:px-6 sm:pb-10 2xl:py-6
+      2xl:flex-row 2xl:w-full 2xl:h-auto 2xl:items-center"
     >
       <button 
         type="button" 
@@ -73,7 +73,7 @@ const Sidebar = () => {
       >menu</button>
 
       {/* Logo Section */}
-      <div className="flex items-center gap-3 py-6 border-shadow-color ml-12 md:ml-0">
+      <div className="flex items-center gap-3 py-6 ml-12 md:ml-0 2xl:py-0">
         <div className="w-10 h-10 rounded-full bg-shadow-color flex items-center justify-center">
           <img 
             src="/src/assets/HandySloth Logo.png" 
@@ -86,11 +86,11 @@ const Sidebar = () => {
 
       {/* Navigation Items */}
       <nav className={`fixed top-0 ${isSidebarOpen ? 'left-0' : '-left-full'} transition-left duration-300 w-full bg-transparent z-1 
-        md:bg-transparent md:h-auto md:z-0 md:py-0 md:px-0
-        md:relative md:left-0 gap-4 flex flex-col 2xl:flex-row 2xl:items-center 2xl:gap-0`}
+        md:bg-transparent md:z-0 md:py-0 md:px-0
+        md:relative md:left-0 gap-4 flex flex-col 2xl:flex-row 2xl:items-center 2xl:gap-0 2xl:ml-6`}
         onClick={() => send({ type: 'CLOSE_SIDEBAR' })}
       >
-        <div className='w-[330px] md:w-full bg-main-color dark:bg-primary-bg md:bg-transparent py-6 px-4 h-screen'>
+        <div className='w-[330px] md:w-full bg-main-color dark:bg-primary-bg md:bg-transparent py-6 px-4 h-screen md:px-0 md:h-auto md:py-0'>
 
           <div className="flex items-center gap-3 py-4 px-4 md:hidden">
             <div className="w-12 h-12 rounded-full bg-shadow-color flex items-center">
@@ -103,7 +103,7 @@ const Sidebar = () => {
             <span className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-black-color'}`}>HandySloth</span>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 2xl:flex-row 2xl:items-center 2xl:gap-0">
             {
               navItems.map((item) => (
                 <NavLink
@@ -129,7 +129,7 @@ const Sidebar = () => {
 
       {/* Bottom Controls */}
       <div className="
-          relative gap-3 flex items-center md:mt-auto
+          relative gap-3 flex items-center md:mt-auto 2xl:mt-0
           [&>button]:bg-transparent [&>button]:text-gray-500! md:[&>button]:bg-primary-bg md:[&>button]:dark:bg-main-color! 
           md:[&>button]:text-black-color! 
           [&>button]:font-medium [&>button]:hover:opacity-90 [&>button]:transition-opacity [&>button]:rounded-lg

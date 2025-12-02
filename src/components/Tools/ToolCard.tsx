@@ -1,16 +1,26 @@
 import "bootstrap";
 import { useState, memo } from 'react';
 import type { Tool } from '../../types';
+import { useNavigate } from 'react-router-dom';
 
 const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
+  const navigate = useNavigate();
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 
-  const handleBookmark = () => {
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsBookmarked(!isBookmarked);
   };
 
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div className="relative flex flex-col gap-4 rounded-2xl bg-[#E2E2FF] p-6 dark:bg-secondary-bg">
+    <div 
+      onClick={() => navigate(`/tool/${tool._id}`)}
+      className="relative flex flex-col gap-4 rounded-2xl bg-[#E2E2FF] p-6 dark:bg-secondary-bg cursor-pointer"
+    >
       <div className="flex gap-3 pt-3">
         <img src={tool.logo} alt={tool.name} className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg object-cover shadow-[0_0_50px_1px_#A9ECEC] dark:shadow-[0_0_30px_1px_#A9ECEC4D]" />
         <div>
@@ -23,8 +33,9 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
         </span>
 
         <button 
+          type="button"
           onClick={handleBookmark}
-          className='min-w-max! p-0! text-primary-color ml-auto bg-transparent!'
+          className='h-max! w-max! p-1! text-primary-color ml-auto bg-transparent!'
         >
           {
             isBookmarked ? (
@@ -49,8 +60,9 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
           <a
             href={link.url}
             key={link.label}
+            onClick={handleLinkClick}
             className={`w-full font-extralight! flex-1 text-center rounded-full shadow-[0_0_90px_0.1px_#A9ECEC] dark:shadow-none border-2 border-main-color dark:border-none px-4 lg:px-2 py-1 md:py-2 bg-primary-bg 
-            text-primary-color drop-shadow-sm shadow-main-color${link.url === '' ? ' pointer-events-none opacity-100' : ''}`}
+            text-primary-color drop-shadow-sm shadow-main-color${link.url === '' ? ' pointer-events-none opacity-50' : ''}`}
           >
             {link.label}
           </a>

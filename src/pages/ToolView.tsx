@@ -184,7 +184,7 @@ const ToolViewPage = () => {
         </p>
       </main>
 
-      <main className="flex flex-col xl:flex-row gap-6 bg-primary-bg xl:bg-transparent px-3 lg:px-6 py-8 rounded-3xl">
+      <main className="flex flex-col xl:flex-row gap-6 bg-primary-bg xl:bg-transparent px-3 xl:-mx-6 py-8 rounded-3xl">
         <img
           alt="Tool Usage Image"
           src={ToolImage}
@@ -223,7 +223,7 @@ const ToolViewPage = () => {
                         "Dummy",
                         "Dummy",
                         "Dummy",
-                    ].map((text) => (<span key={text}>{text}</span>))
+                    ].map((text, index) => (<span key={index}>{text}</span>))
                 }
             </div>
 
@@ -252,22 +252,25 @@ const ToolViewPage = () => {
                     <h3>Recommendations</h3>
                 </button>
 
-                <p className="text-sm text-secondary-color font-extralight">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                    industry. Lorem Ipsum has been the industry's standard dummy text
-                    ever since the 1500s, when an unknown printer took a galley of type
-                    and scrambled it to make a type specimen book. It has survived not
-                    only five centuries, but also the leap into electronic typesetting,
-                    remaining essentially unchanged. It was popularised in the 1960s
-                    with the release of Letraset sheets containing Lorem Ipsum passages,
-                    and more recently with desktop publishing software like Aldus
-                    PageMaker including versions of Lorem Ipsum.
-                </p>
             </div>
 
-            <button type="button" className="-mb-2 bg-secondary-bg! text-center! py-3!">Visit Website</button>
-            <button type="button" className="-mb-2 bg-main-color! text-center! py-3! text-black-color!">Save</button>
         </div>
+      </main>
+
+      <main className="flex flex-col gap-4 bg-primary-bg px-6 py-15 rounded-3xl">
+        <p className="text-sm text-secondary-color font-extralight">
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry's standard dummy text
+            ever since the 1500s, when an unknown printer took a galley of type
+            and scrambled it to make a type specimen book. It has survived not
+            only five centuries, but also the leap into electronic typesetting,
+            remaining essentially unchanged. It was popularised in the 1960s
+            with the release of Letraset sheets containing Lorem Ipsum passages,
+            and more recently with desktop publishing software like Aldus
+            PageMaker including versions of Lorem Ipsum.
+        </p>
+        <button type="button" className="-mb-2 bg-secondary-bg! text-center! py-3!">Visit Website</button>
+        <button type="button" className="-mb-2 bg-main-color! text-center! py-3! text-black-color!">Save</button>
       </main>
 
       <ToolCommunityRatings tool={tool} />

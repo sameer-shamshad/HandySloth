@@ -26,7 +26,6 @@ interface AuthResponse {
 }
 
 export const checkSession = async (accessToken: string): Promise<CheckSessionResponse> => {
-  console.log('Checking session...', accessToken);
   try {
     const response = await axios.get<CheckSessionResponse>('/api/auth/check-session', {
       headers: {

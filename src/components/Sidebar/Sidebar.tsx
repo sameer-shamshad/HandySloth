@@ -139,7 +139,7 @@ const Sidebar = () => {
           relative gap-3 flex items-center md:mt-auto 2xl:mt-0
           [&>button]:bg-transparent [&>button]:text-gray-500! md:[&>button]:bg-primary-bg md:[&>button]:dark:bg-main-color! 
           md:[&>button]:text-black-color! 
-          [&>button]:font-medium [&>button]:hover:opacity-90 [&>button]:transition-opacity [&>button]:rounded-lg
+          [&>button]:font-medium [&>button:not(:disabled)]:hover:opacity-90 [&>button]:transition-opacity [&>button]:rounded-lg
           2xl:ml-auto
         "
       >

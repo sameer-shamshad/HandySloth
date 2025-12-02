@@ -25,13 +25,14 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMod
   return (
     <div
       ref={menuRef}
-      className="absolute bottom-full left-[80%] mb-2 w-56 bg-main-color rounded-lg shadow-lg p-2 z-50 
-        2xl:left-[-38%] 2xl:top-full 2xl:mt-2 2xl:h-40
+      className="absolute top-full right-0 w-41 md:bottom-full md:top-auto md:left-[80%] mb-2 md:w-56 bg-main-color rounded-sm shadow-lg 
+      p-2 z-50 pb-4 2xl:left-[-38%] 2xl:top-full 2xl:mt-2 2xl:h-40
       "
     >
       {/* Dark Mode Toggle */}
       <button
-        className="w-full! flex items-center justify-between border-b border-gray-500 text-black-color! py-7! mb-2 rounded-none! bg-transparent! transition-colors"
+        type="button"
+        className="w-full! flex items-center justify-between border-b border-gray-500 text-black-color! py-4! md:py-7! mb-2 rounded-none! bg-transparent! transition-colors"
         onClick={onToggleDarkMode}
       >
         <span className="text-sm font-medium text-black-color">Dark Mode</span>
@@ -50,7 +51,8 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMod
 
       {/* Profile */}
       <button
-        className="w-full! flex items-center justify-start! gap-3 bg-transparent! transition-colors"
+        type="button"
+        className="w-full! flex items-center justify-start! gap-3 py-2! bg-transparent! transition-colors"
         onClick={() => {
           console.log('Profile clicked');
           onClose();
@@ -62,7 +64,8 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMod
 
       {/* Disconnect */}
       <button
-        className="w-full! flex items-center justify-start! bg-transparent! transition-colors text-left text-red-500"
+        type="button"
+        className="w-full! flex items-center justify-start! bg-transparent! mt-2"
         onClick={() => {
           console.log('Disconnect clicked');
           onClose();

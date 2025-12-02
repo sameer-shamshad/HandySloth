@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import SettingsMenu from './SettingsMenu';
 import { useMachine } from '@xstate/react';
 import { NavLink } from 'react-router-dom';
-import SlothIcon from '../../assets/SlothIcon';
 import { sidebarMachine } from '../../machines/SidebarMachine';
 
 interface NavItem {
@@ -27,11 +26,13 @@ const Sidebar = () => {
   const [state, send] = useMachine(sidebarMachine, {
     input: {
       isDarkMode: getInitialDarkMode(),
+      // isSidebarOpen: false,
       isSettingsOpen: false,
     },
   });
   
   const isDarkMode = state.context.isDarkMode;
+  const isSidebarOpen = state.context.isSidebarOpen;
   const isSettingsOpen = state.context.isSettingsOpen;
 
   // Apply dark mode class on mount
@@ -61,56 +62,87 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside id='sidebar' className="fixed top-0 -left-full md:relative md:left-0 flex flex-col h-screen w-64 
-      bg-main-color dark:bg-primary-bg border-r border-group-bg p-3 sm:p-6
+    <aside id='sidebar' className="flex items-center justify-between md:flex-col md:h-screen md:w-68
+      bg-primary-bg md:bg-main-color md:dark:bg-primary-bg border-r border-group-bg px-4 py-2 sm:px-6 sm:pb-10
       2xl:flex-row 2xl:w-full 2xl:h-[80px] 2xl:items-center"
     >
-      {/* Logo Section */}
-      <div className="flex items-center gap-3 py-6 border-shadow-color">
-        <div className="w-10 h-10 rounded-full bg-shadow-color flex items-center justify-center">
-          <SlothIcon />
-        </div>
-        <span className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-black-color'}`}>HandySloth</span>
+      <button 
+        type="button" 
+        className="material-symbols-outlined md:invisible" 
+        onClick={() => send({ type: 'TOGGLE_SIDEBAR' })}
+      >menu</button>
 
-        <button className="material-symbols-outlined sm:invisible" onClick={() => send({ type: 'TOGGLE_SIDEBAR' })}>menu_open</button>
+      {/* Logo Section */}
+      <div className="flex items-center gap-3 py-6 border-shadow-color ml-12 md:ml-0">
+        <div className="w-10 h-10 rounded-full bg-shadow-color flex items-center justify-center">
+          <img 
+            src="/src/assets/HandySloth Logo.png" 
+            alt="HandySloth"
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <span className={`hidden md:block text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-black-color'}`}>HandySloth</span>
       </div>
 
       {/* Navigation Items */}
-      <nav className="gap-4 flex flex-col 2xl:flex-row 2xl:items-center 2xl:gap-0">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.label}
-            to={item.to}
-            end={item.to === '/'}
-            className={({ isActive }) =>
-              `w-full flex items-center gap-3 px-4 py-2 rounded-lg 2xl:w-max transition-colors ${
-                isActive
-                  ? 'bg-shadow-color text-black-color dark:bg-secondary-bg dark:text-primary-color'
-                  : 'text-gray-500! hover:bg-shadow-color'
-              }`
+      <nav className={`fixed top-0 ${isSidebarOpen ? 'left-0' : '-left-full'} transition-left duration-300 w-full bg-transparent z-1 
+        md:bg-transparent md:h-auto md:z-0 md:py-0 md:px-0
+        md:relative md:left-0 gap-4 flex flex-col 2xl:flex-row 2xl:items-center 2xl:gap-0`}
+        onClick={() => send({ type: 'CLOSE_SIDEBAR' })}
+      >
+        <div className='w-[330px] md:w-full bg-main-color dark:bg-primary-bg md:bg-transparent py-6 px-4 h-screen'>
+
+          <div className="flex items-center gap-3 py-4 px-4 md:hidden">
+            <div className="w-12 h-12 rounded-full bg-shadow-color flex items-center">
+              <img 
+                src="/src/assets/HandySloth Logo.png" 
+                alt="HandySloth"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <span className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-black-color'}`}>HandySloth</span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {
+              navItems.map((item) => (
+                <NavLink
+                  key={item.label}
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    `w-full flex items-center gap-3 px-4 py-4 md:py-2 rounded-2xl 2xl:w-max transition-colors ${
+                      isActive
+                        ? 'bg-[#8fd7d7] dark:bg-[#080a13] text-black-color dark:text-primary-color'
+                        : 'text-gray-500! hover:bg-shadow-color'
+                    }`
+                  }
+                >
+                  <span className={`material-symbols-outlined ${item.invert ? 'rotate-180' : ''}`}>{item.icon}</span>
+                  <span className="text-sm font-medium">{item.label}</span>
+                </NavLink>
+              ))
             }
-          >
-            <span className={`material-symbols-outlined ${item.invert ? 'rotate-180' : ''}`}>{item.icon}</span>
-            <span className="text-sm font-medium">{item.label}</span>
-          </NavLink>
-        ))}
+          </div>
+        </div>
       </nav>
 
       {/* Bottom Controls */}
       <div className="
-          relative gap-3 flex items-center justify-between mt-auto
-          [&>button]:bg-primary-bg [&>button]:dark:bg-main-color! [&>button]:text-black-color! 
+          relative gap-3 flex items-center md:mt-auto
+          [&>button]:bg-transparent [&>button]:text-gray-500! md:[&>button]:bg-primary-bg md:[&>button]:dark:bg-main-color! 
+          md:[&>button]:text-black-color! 
           [&>button]:font-medium [&>button]:hover:opacity-90 [&>button]:transition-opacity [&>button]:rounded-lg
           2xl:ml-auto
         "
       >
         <button
           type="button"
-          className="flex items-center justify-center gap-2 py-2!"
+          className="flex items-center justify-center md:gap-2 py-2! rounded-full! pl-4! pr-6!"
           onClick={() => { console.log('Connect clicked') }}
         >
           <span className="material-symbols-outlined">network_node</span>
-          <span>Connect</span>
+          <span className="hidden md:block">Connect</span>
         </button>
 
           <button

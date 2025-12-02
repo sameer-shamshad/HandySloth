@@ -1,12 +1,10 @@
 import { Outlet } from 'react-router-dom';
 import Footer from '../components/Footer/Footer';
 import Sidebar from '../components/Sidebar/Sidebar';
-import MobileSidebar from '../components/Sidebar/MobileSidebar';
 
 const DashboardLayout = () => {
   return (
     <div className='flex flex-col md:flex-row 2xl:flex-col h-screen'>
-      {/* <MobileSidebar /> */}
       <Sidebar />
 
       <div className='flex flex-col h-full w-full bg-primary-bg dark:bg-black-color overflow-auto'>

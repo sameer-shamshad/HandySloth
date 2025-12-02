@@ -3,13 +3,13 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 
 const AuthModal = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isRegister, setIsRegister] = useState(false);
 
-  return isLogin ? (
-    <Login onSwitchToRegister={() => setIsLogin(false)} />
-  ) : (
-    <Register onSwitchToLogin={() => setIsLogin(true)} />
-  );
+  if (isRegister) {
+    return <Register onSwitchToLogin={() => setIsRegister(false)} />;
+  }
+
+  return <Login onSwitchToRegister={() => setIsRegister(true)} />;
 };
 
 export default AuthModal;

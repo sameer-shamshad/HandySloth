@@ -1,26 +1,51 @@
-import { useState } from 'react';
+import { useMachine } from '@xstate/react';
+import { useEffect } from 'react';
+import loginMachine from '../machines/LoginMachine';
+import { useAuth } from '../context/AuthProvider';
 
-interface LoginFormProps {
-  onSwitchToRegister: () => void;
+interface LoginProps {
+  onSwitchToRegister?: () => void;
 }
 
-const Login = ({ onSwitchToRegister }: LoginFormProps) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login = ({ onSwitchToRegister }: LoginProps) => {
+  const [state, send] = useMachine(loginMachine);
+  const { send: sendAuth } = useAuth();
+  const { email, password, error } = state.context;
+
+  // Notify AuthMachine when login succeeds
+  useEffect(() => {
+    if (state.matches('success') && state.context.authResponse) {
+      const { accessToken, user } = state.context.authResponse;
+      sendAuth({
+        type: 'SET_AUTHENTICATED',
+        user,
+        accessToken,
+      });
+    }
+  }, [state, sendAuth]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Login:', { email, password });
+    send({ type: 'SUBMIT' });
   };
 
+  const handleSwitchToRegister = () => {
+    if (onSwitchToRegister) {
+      onSwitchToRegister();
+    }
+  };
+
+  const isLoading = state.matches('submitting');
+  const isSuccess = state.matches('success');
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1 mb-2">
+    <div className="flex flex-col">
+      <div className="flex flex-col gap-1 mb-5">
         <h2 className="text-2xl font-bold text-primary-color">Welcome Back</h2>
         <p className="text-sm text-secondary-color">Sign in to your account to continue</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className="text-sm font-medium text-primary-color">
             Email
@@ -30,13 +55,13 @@ const Login = ({ onSwitchToRegister }: LoginFormProps) => {
             type="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'email', value: e.target.value })}
             placeholder="Enter your email"
-            className="w-full rounded-lg border border-border-color bg-secondary-bg px-4 py-3 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color"
+            className="w-full rounded-lg border border-border-color bg-secondary-bg px-3 py-2 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color"
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <label htmlFor="password" className="text-sm font-medium text-primary-color">
             Password
           </label>
@@ -45,42 +70,40 @@ const Login = ({ onSwitchToRegister }: LoginFormProps) => {
             type="password"
             required
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => send({ type: 'CHANGE_FIELD', field: 'password', value: e.target.value })}
             placeholder="Enter your password"
-            className="w-full rounded-lg border border-border-color bg-secondary-bg px-4 py-3 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color"
+            className="w-full rounded-lg border border-border-color bg-secondary-bg px-3 py-2 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color"
           />
         </div>
 
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              className="w-4 h-4 rounded border-border-color text-main-color focus:ring-main-color"
-            />
-            <span className="text-sm text-secondary-color">Remember me</span>
-          </label>
-          <button
-            type="button"
-            className="text-sm text-main-color hover:underline focus:outline-none"
-          >
-            Forgot password?
-          </button>
-        </div>
+        <button
+          type="button"
+          className="w-max mx-auto text-sm text-main-color hover:underline focus:outline-none"
+        >
+          Forgot password?
+        </button>
+
+        {error && (
+          <div className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg">
+            {error}
+          </div>
+        )}
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-main-color px-4 py-3 text-sm font-semibold text-black-color hover:bg-main-color/90 transition-colors focus:outline-none focus:ring focus:ring-main-color"
+          disabled={isLoading}
+          className="w-full rounded-lg bg-main-color! px-4 py-3! text-sm font-semibold text-black-color hover:bg-main-color/90 transition-colors focus:outline-none focus:ring focus:ring-main-color disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sign In
+          {isLoading ? 'Signing In...' : isSuccess ? 'Success!' : 'Sign In'}
         </button>
       </form>
 
-      <div className="flex items-center justify-center gap-1 pt-2">
+      <div className="flex items-center justify-center gap-0 pt-4">
         <span className="text-sm text-secondary-color">Don't have an account?</span>
         <button
           type="button"
-          onClick={onSwitchToRegister}
-          className="text-sm font-semibold text-main-color hover:underline focus:outline-none"
+          onClick={handleSwitchToRegister}
+          className="text-sm font-semibold text-main-color! hover:underline focus:outline-none"
         >
           Sign Up
         </button>

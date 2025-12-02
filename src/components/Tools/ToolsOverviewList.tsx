@@ -4,8 +4,8 @@ import type { Tool } from '../../types';
 const ToolsOverviewList = ({ tools = [], toolsLabel = "" }: { tools: Tool[], toolsLabel: string }) => {
     return (
         <div className='w-full grid grid-rows-7'>
-            <h4 className='w-min lg:w-max h-min px-4 text-wrap text-xs sm:text-sm lg:px-4 lg:text-lg 2xl:text-[16px] justify-self-center sm:justify-self-start xl:mx-10 2xl:mx-30
-                leading-none font-extrabold uppercase bg-main-color text-black-color text-center py-2 rounded-lg my-auto'>
+            <h4 className='w-min lg:w-max h-min px-4 text-wrap text-xs sm:text-sm lg:px-4 lg:text-md justify-self-center sm:justify-self-start xl:mx-10 2xl:mx-30
+                leading-none font-bold uppercase bg-main-color text-black-color text-center py-2 rounded-lg my-auto'>
                 {toolsLabel}
             </h4>
 

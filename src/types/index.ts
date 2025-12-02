@@ -65,3 +65,25 @@ export type Contact = {
   reason: string;
   terms: boolean;
 }
+
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AuthContext {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  rememberMe: boolean;
+  user: User | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}

@@ -6,6 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { sidebarMachine } from '../../machines/SidebarMachine';
 import { useModal } from '../../context/ModalProvider';
 import AuthModal from '../AuthModal';
+import { useAuth } from '../../context';
 
 interface NavItem {
   label: string;
@@ -16,6 +17,9 @@ interface NavItem {
 
 const Sidebar = () => {
   const { openModal } = useModal();
+  const { state: authState } = useAuth();
+
+  const isAuthenticated = authState.matches('authenticated');
   
   const getInitialDarkMode = () => {
     if (typeof window === 'undefined') return false;
@@ -141,7 +145,8 @@ const Sidebar = () => {
       >
         <button
           type="button"
-          className="flex items-center justify-center md:gap-2 py-2! rounded-full! pl-4! pr-6!"
+          disabled={isAuthenticated}
+          className="flex items-center justify-center md:gap-2 py-2! rounded-full! pl-4! pr-6! disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => {
             openModal({
               component: <AuthModal />,
@@ -151,7 +156,7 @@ const Sidebar = () => {
           }}
         >
           <span className="material-symbols-outlined">network_node</span>
-          <span className="hidden md:block">Connect</span>
+          <span className="hidden md:block">{isAuthenticated ? 'Connected' : 'Connect'}</span>
         </button>
 
           <button

@@ -78,8 +78,8 @@ const loginMachine = setup({
   id: 'loginMachine',
   initial: 'idle',
   context: {
-    email: '',
-    password: '',
+    email: 'sameershamshad.42@gmail.com',
+    password: '12345678',
     error: null,
     authResponse: null,
   },

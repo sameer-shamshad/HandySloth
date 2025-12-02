@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { useAuth } from '../../context';
 
 interface SettingsMenuProps {
   isDarkMode: boolean;
@@ -8,6 +9,9 @@ interface SettingsMenuProps {
 
 const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMode, onClose }) => {
   const menuRef = useRef<HTMLDivElement>(null);
+  const { state: authState, send: authSend } = useAuth();
+
+  const isAuthenticated = authState.matches('authenticated');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,10 +58,9 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMod
         type="button"
         className="w-full! flex items-center justify-start! gap-3 py-2! bg-transparent! transition-colors"
         onClick={() => {
-          console.log('Profile clicked');
           onClose();
         }}
-      >
+        >
         <span className="material-symbols-outlined text-black-color">person</span>
         <span className="text-sm font-medium text-black-color">Profile</span>
       </button>
@@ -65,9 +68,10 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMod
       {/* Disconnect */}
       <button
         type="button"
-        className="w-full! flex items-center justify-start! bg-transparent! mt-2"
+        disabled={!isAuthenticated}
+        className="w-full! flex items-center justify-start! bg-transparent! mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={() => {
-          console.log('Disconnect clicked');
+          authSend({ type: 'LOGOUT' });
           onClose();
         }}
       >

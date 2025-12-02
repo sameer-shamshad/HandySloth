@@ -1,6 +1,5 @@
 import { setup } from "xstate";
 
-
 const authMachine = setup({
     types: {
 

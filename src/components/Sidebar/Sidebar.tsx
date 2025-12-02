@@ -4,6 +4,8 @@ import SettingsMenu from './SettingsMenu';
 import { useMachine } from '@xstate/react';
 import { NavLink } from 'react-router-dom';
 import { sidebarMachine } from '../../machines/SidebarMachine';
+import { useModal } from '../../context/ModalProvider';
+import AuthModal from '../AuthModal';
 
 interface NavItem {
   label: string;
@@ -13,6 +15,7 @@ interface NavItem {
 }
 
 const Sidebar = () => {
+  const { openModal } = useModal();
   
   const getInitialDarkMode = () => {
     if (typeof window === 'undefined') return false;
@@ -139,7 +142,13 @@ const Sidebar = () => {
         <button
           type="button"
           className="flex items-center justify-center md:gap-2 py-2! rounded-full! pl-4! pr-6!"
-          onClick={() => { console.log('Connect clicked') }}
+          onClick={() => {
+            openModal({
+              component: <AuthModal />,
+              title: '',
+              size: 'sm',
+            });
+          }}
         >
           <span className="material-symbols-outlined">network_node</span>
           <span className="hidden md:block">Connect</span>

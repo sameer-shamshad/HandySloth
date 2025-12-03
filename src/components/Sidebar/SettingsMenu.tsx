@@ -30,7 +30,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMod
     <div
       ref={menuRef}
       className="absolute top-full right-0 w-41 md:bottom-full md:top-auto md:left-[80%] mb-2 md:w-56 bg-main-color rounded-sm shadow-lg 
-      p-2 z-50 pb-4 2xl:left-[-38%] 2xl:top-full 2xl:mt-2 2xl:h-40
+      p-2 z-50 pb-4 2xl:left-[-38%] 2xl:top-full 2xl:mt-2 2xl:h-max
       "
     >
       {/* Dark Mode Toggle */}

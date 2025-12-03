@@ -1,6 +1,6 @@
 import ToolsOverviewList from './ToolsOverviewList';
-import { selectTrendingTools, selectPopularTools, selectRecentTools } from '../../machines/ToolMachine';
 import { useTools } from '../../context/ToolsProvider';
+import { selectTrendingTools, selectPopularTools, selectRecentTools } from '../../machines/ToolMachine';
 
 const ToolsOverview = () => {
   const { state } = useTools();

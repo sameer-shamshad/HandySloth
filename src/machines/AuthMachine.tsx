@@ -52,9 +52,7 @@ const authMachine = setup({
                             
                             localStorage.setItem('accessToken', refreshResponse.accessToken);
                             
-                            const newResponse = await checkSessionApi(refreshResponse.accessToken);
                             return {
-                                ...newResponse,
                                 accessToken: refreshResponse.accessToken,
                             };
                         } catch (refreshError) {

@@ -11,21 +11,21 @@ const App = () => {
     <ToolsProvider>
       <AuthProvider>
         <ModalProvider>
-          <Routes>
-            <Route path='/' element={<DashboardLayout />}>
-              <Route index path='/' element={<HomePage />} />
-              <Route path='/dashboard' element={<DashboardPage />} />
-              <Route path='/trending' element={<TrendingPage />} />
-              <Route path='/popular' element={<PopularPage />} />
-              <Route path='/category' element={<CategoriesPage />} />
-              <Route path='/submit' element={<SubmitToolPage />} />
-              <Route path='/contact' element={<ContactPage />} />
-              <Route path='/tool/:id' element={<ToolViewPage />} />
-              <Route path='/submit/create-tool' element={<CreateToolPage />} />
-            </Route>
+      <Routes>
+        <Route path='/' element={<DashboardLayout />}>
+          <Route index path='/' element={<HomePage />} />
+          <Route path='/dashboard' element={<DashboardPage />} />
+          <Route path='/trending' element={<TrendingPage />} />
+          <Route path='/popular' element={<PopularPage />} />
+          <Route path='/category' element={<CategoriesPage />} />
+          <Route path='/submit' element={<SubmitToolPage />} />
+          <Route path='/contact' element={<ContactPage />} />
+          <Route path='/tool/:id' element={<ToolViewPage />} />
+          <Route path='/submit/create-tool' element={<CreateToolPage />} />
+        </Route>
 
-            <Route path='/*' element={<NotFoundPage />} />
-          </Routes>
+        <Route path='/*' element={<NotFoundPage />} />
+      </Routes>
           <ModalContainer />
         </ModalProvider>
       </AuthProvider>

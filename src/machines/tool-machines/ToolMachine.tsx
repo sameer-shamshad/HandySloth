@@ -1,25 +1,11 @@
-import type { Tool, NewTool } from '../types';
+import type { Tool } from '../../types';
 import { assign, setup, fromPromise } from 'xstate';
-import { fetchToolsMock, createToolMock } from '../services/toolsService';
+import { fetchToolsMock } from '../../services/tools.service';
 
-const initialNewTool: NewTool = {
-  name: '',
-  category: '',
-  shortDescription: '',
-  fullDetail: '',
-  toolImages: [],
-  tags: [],
-  links: {
-    telegram: '',
-    x: '',
-    website: '',
-  },
-};
-
-const sortBy = (tools: Tool[], key: 'views' | 'clicks') => [...tools].sort((a, b) => b[key] - a[key]);
+const sortBy = (tools: Tool[], key: 'views') => [...tools].sort((a, b) => b[key] - a[key]);
 
 export const selectTrendingTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
-export const selectPopularTools = (tools: Tool[], limit = 5) => sortBy(tools, 'clicks').slice(0, limit);
+export const selectPopularTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
 export const selectRecentTools = (tools: Tool[], limit = 5) => [...tools].sort((a, b) => {
   return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 }).slice(0, limit);
@@ -31,21 +17,16 @@ export const toolMachine = setup({
       recentTools: Tool[];
       popularTools: Tool[];
       trendingTools: Tool[];
-      newTool: NewTool;
     },
     events: {} as
       | { type: 'FETCH_TOOLS'; tools: Tool[] }
-      | { type: 'ADD_TOOL'; tool: NewTool }
+      | { type: 'ADD_TOOL'; tool: Tool }
       | { type: 'UPDATE_TOOL'; tool: Tool }
       | { type: 'DELETE_TOOL'; id: string }
       | { type: 'INCREMENT_VIEW'; id: string }
-      | { type: 'INCREMENT_CLICK'; id: string }
-      | { type: 'CHANGE_FIELD'; field: keyof NewTool; value: NewTool[keyof NewTool] }
-      | { type: 'SUBMIT_TOOL' },
   },
   actors: {
     fetchTools: fromPromise(() => fetchToolsMock()),
-    createTool: fromPromise(({ input }) => createToolMock(input as NewTool)),
   },
   actions: {
     assignFetchedTools: assign(({ event }) => {
@@ -68,23 +49,14 @@ export const toolMachine = setup({
         trendingTools: selectTrendingTools(event.tools),
       };
     }),
-    changeField: assign(({ context, event }) => {
-      if (event.type !== 'CHANGE_FIELD') return context;
-        return {
-          ...context,
-          newTool: {
-            ...context.newTool,
-            [event.field]: event.value,
-          },
-        };
-    }),
     addTool: assign(({ context, event }) => {
-      // when coming from invoke onDone, event has shape { type: 'done.invoke...', output: Tool }
-      const tool = (event as unknown as { output: Tool }).output;
+      if (event.type !== 'ADD_TOOL') return context;
       return {
         ...context,
-        newTool: initialNewTool,                            // reset form
-        tools: [tool, ...context.tools],
+        tools: [event.tool, ...context.tools],
+        recentTools: selectRecentTools([event.tool, ...context.tools]),
+        popularTools: selectPopularTools([event.tool, ...context.tools]),
+        trendingTools: selectTrendingTools([event.tool, ...context.tools]),
       };
     }),
     updateTool: assign(({ context, event }) => {
@@ -128,20 +100,6 @@ export const toolMachine = setup({
         trendingTools: context.trendingTools.map((tool) => tool._id === event.id ? updatedTool : tool),
       };
     }),
-    incrementClick: assign(({ context, event }) => {
-      if (event.type !== 'INCREMENT_CLICK') return context;
-
-      const toolToUpdate = context.tools.find((tool) => tool._id === event.id);
-      if (!toolToUpdate) return context;
-
-      const updatedTool = { ...toolToUpdate, clicks: toolToUpdate.clicks + 1 };
-      return {
-        tools: context.tools.map((tool) => tool._id === event.id ? updatedTool : tool),
-        recentTools: context.recentTools.map((tool) => tool._id === event.id ? updatedTool : tool),
-        popularTools: context.popularTools.map((tool) => tool._id === event.id ? updatedTool : tool),
-        trendingTools: context.trendingTools.map((tool) => tool._id === event.id ? updatedTool : tool),
-      };
-    }),
   },
 }).createMachine({
   id: 'toolMachine',
@@ -151,7 +109,6 @@ export const toolMachine = setup({
     recentTools: [],
     popularTools: [],
     trendingTools: [],
-    newTool: initialNewTool,
   },
   states: {
     loading: {
@@ -166,23 +123,11 @@ export const toolMachine = setup({
     idle: {
       on: {
         FETCH_TOOLS: { actions: 'fetchTools' },
-        CHANGE_FIELD: { actions: 'changeField' },
-        SUBMIT_TOOL: { target: 'creatingTool' }, 
+        ADD_TOOL: { actions: 'addTool' },
         UPDATE_TOOL: { actions: 'updateTool' },
         DELETE_TOOL: { actions: 'deleteTool' },
         INCREMENT_VIEW: { actions: 'incrementView' },
-        INCREMENT_CLICK: { actions: 'incrementClick' },
       },
-    },
-    creatingTool: {
-      invoke: {
-        src: 'createTool',
-        input: ({ context }) => context.newTool,
-        onDone: {
-          target: 'idle',
-          actions: 'addTool',
-        },
-      }
     }
   },
 });

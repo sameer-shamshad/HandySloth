@@ -1,6 +1,6 @@
 import type { User } from "../types";
 import { assign, fromPromise, setup } from "xstate";
-import { register as registerApi } from "../services/authService";
+import { register as registerApi } from "../services/auth.service";
 
 const registerMachine = setup({
     types: {

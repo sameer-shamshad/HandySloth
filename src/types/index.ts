@@ -43,17 +43,17 @@ export interface Tool {
   shortDescription?: string;
   fullDetail?: string;
   toolImages?: string[];
-  category: ToolCategory;
+  category: ToolCategory[];
   tags: ToolTag[];
-  clicks: number;
   views: number;
   createdAt: string;
+  updatedAt: string;
   bookmarks: number;
-  logo?: string;
+  logo: string;
   links: SocialLinks;
 }
 
-export type NewTool = Omit<Tool, '_id' | 'clicks' | 'views' | 'createdAt' | 'bookmarks' | 'logo'>;
+export type NewTool = Omit<Tool, '_id' | 'views' | 'createdAt' | 'updatedAt' | 'bookmarks' | 'logo'>;
 
 export type Contact = {
   firstName: string;

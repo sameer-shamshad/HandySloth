@@ -1,5 +1,5 @@
 import ToolsGrid from '../components/Tools/ToolsGrid';
-import { selectPopularTools } from '../machines/ToolMachine';
+import { selectPopularTools } from '../machines/tool-machines/ToolMachine';
 import type { Tool } from '../types';
 import { useTools } from '../context/ToolsProvider';
 

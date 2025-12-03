@@ -1,6 +1,6 @@
 import { useMachine } from '@xstate/react';
 import type { EventFrom, StateFrom } from 'xstate';
-import { toolMachine } from '../machines/ToolMachine';
+import { toolMachine } from '../machines/tool-machines/ToolMachine';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
 type ToolsContextValue = {

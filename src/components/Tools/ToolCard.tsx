@@ -25,7 +25,7 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
         <img src={tool.logo} alt={tool.name} className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg object-cover shadow-[0_0_50px_1px_#A9ECEC] dark:shadow-[0_0_30px_1px_#A9ECEC4D]" />
         <div>
           <p className="text-base font-semibold text-primary-color">{tool.name}</p>
-          <p className="text-[11px] uppercase tracking-wide text-secondary-color mt-1">{tool.category}</p>
+          <p className="text-[11px] uppercase tracking-wide text-secondary-color mt-1">{tool.category.join(', ')}</p>
           <p className="text-xs text-secondary-color font-maven-pro my-1">{tool.shortDescription}</p>
         </div>
         <span className="absolute -top-3 left-0 rounded-md bg-main-color w-14 text-center py-1 text-sm font-medium text-black-color">

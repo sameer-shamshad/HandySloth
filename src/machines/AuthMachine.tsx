@@ -3,7 +3,7 @@ import { assign, fromPromise, setup } from "xstate";
 import { 
     checkSession as checkSessionApi, 
     refreshAccessToken as refreshAccessTokenApi
-} from "../services/authService";
+} from "../services/auth.service";
 
 const getInitialContext = () => {
     const accessToken = localStorage.getItem('accessToken');

@@ -1,5 +1,5 @@
-import { AxiosError } from 'axios';
 import axios from '../lib/axios';
+import { AxiosError } from 'axios';
 import type { User } from '../types';
 
 interface CheckSessionResponse {
@@ -23,6 +23,7 @@ interface AuthResponse {
   user: User;
   message: string;
   accessToken: string;
+  refreshToken: string;
 }
 
 export const checkSession = async (accessToken: string): Promise<CheckSessionResponse> => {
@@ -35,7 +36,9 @@ export const checkSession = async (accessToken: string): Promise<CheckSessionRes
     return response.data;
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
-      throw new Error(error.response?.data.message || 'An error occurred');
+      const customError = new Error(error.response?.data.message || 'An error occurred') as Error & { statusCode?: number };
+      customError.statusCode = error.response?.status;
+      throw customError;
     }
     throw error;
   }
@@ -68,6 +71,24 @@ export const register = async (userData: RegisterRequest): Promise<AuthResponse>
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'An error occurred');
+    }
+    throw error;
+  }
+};
+
+interface RefreshAccessTokenResponse {
+  accessToken: string;
+}
+
+export const refreshAccessToken = async (refreshToken: string): Promise<RefreshAccessTokenResponse> => {
+  try {
+    const response = await axios.post<RefreshAccessTokenResponse>('/api/auth/refresh-access-token', {
+      refreshToken,
+    });
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to refresh access token');
     }
     throw error;
   }

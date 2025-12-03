@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [state, send] = useMachine(authMachine);
 
     const value = useMemo(() => {
-        return { state, send };
+      return { state, send };
     }, [state, send]);
 
   return (
@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -33,4 +32,3 @@ export const useAuth = (): AuthContextValue => {
 
   return context;
 };
-

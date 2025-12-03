@@ -10,7 +10,7 @@ const registerMachine = setup({
             password: string;
             confirmPassword: string;
             error: string | null;
-            authResponse: { accessToken: string; user: User } | null;
+            authResponse: { accessToken: string; refreshToken: string; user: User } | null;
         },
         events: {} as
             | { type: 'CHANGE_FIELD'; field: 'username' | 'email' | 'password' | 'confirmPassword'; value: string }
@@ -88,8 +88,9 @@ const registerMachine = setup({
             return context;
         }),
         storeAuth: assign(({ context, event }) => {
-            const output = (event as unknown as { output: { accessToken: string; user: User } }).output;
+            const output = (event as unknown as { output: { accessToken: string; refreshToken: string; user: User } }).output;
             localStorage.setItem('accessToken', output.accessToken);
+            localStorage.setItem('refreshToken', output.refreshToken);
             return {
                 ...context,
                 authResponse: output,

@@ -15,11 +15,12 @@ const Login = ({ onSwitchToRegister }: LoginProps) => {
   // Notify AuthMachine when login succeeds
   useEffect(() => {
     if (state.matches('success') && state.context.authResponse) {
-      const { accessToken, user } = state.context.authResponse;
+      const { accessToken, refreshToken, user } = state.context.authResponse;
       sendAuth({
         type: 'SET_AUTHENTICATED',
         user,
         accessToken,
+        refreshToken,
       });
     }
   }, [state, sendAuth]);

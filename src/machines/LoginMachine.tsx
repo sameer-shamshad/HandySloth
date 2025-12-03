@@ -8,7 +8,7 @@ const loginMachine = setup({
       email: string;
       password: string;
       error: string | null;
-      authResponse: { accessToken: string; user: User } | null;
+      authResponse: { accessToken: string; refreshToken: string; user: User } | null;
     },
     events: {} as
       | { type: 'CHANGE_FIELD'; field: 'email' | 'password' | 'rememberMe'; value: string | boolean }
@@ -59,12 +59,11 @@ const loginMachine = setup({
         return context;
       }),
       storeAuth: assign(({ context, event }) => {
-        const output = (event as unknown as { output: { accessToken: string; user: User } }).output;
+        const output = (event as unknown as { output: { accessToken: string; user: User; refreshToken: string } }).output;
         localStorage.setItem('accessToken', output.accessToken);
-        return {
-          ...context,
-          authResponse: output,
-        };
+        localStorage.setItem('refreshToken', output.refreshToken);
+
+        return { ...context, authResponse: output };
       }),
   },
   guards: {

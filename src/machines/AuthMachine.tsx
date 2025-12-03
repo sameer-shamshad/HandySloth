@@ -1,13 +1,18 @@
 import type { User } from "../types";
 import { assign, fromPromise, setup } from "xstate";
-import { checkSession as checkSessionApi } from "../services/authService";
+import { 
+    checkSession as checkSessionApi, 
+    refreshAccessToken as refreshAccessTokenApi
+} from "../services/authService";
 
 const getInitialContext = () => {
     const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
 
     return {
         user: null,
         accessToken: accessToken || null,
+        refreshToken: refreshToken || null,
         isAuthenticated: false,
         isLoading: false,
     };
@@ -18,16 +23,17 @@ const authMachine = setup({
         context: {} as {
             user: User | null;
             accessToken: string | null;
+            refreshToken: string | null;
             isAuthenticated: boolean;
             isLoading: boolean;
         },
         events: {} as
             | { type: 'LOGOUT' }
-            | { type: 'SET_AUTHENTICATED'; user: User; accessToken: string }
+            | { type: 'SET_AUTHENTICATED'; user: User; accessToken: string; refreshToken: string }
     },
     actors: {
-        checkSession: fromPromise(async ({ input }: { input: { accessToken: string | null } }) => {
-            const { accessToken } = input;
+        checkSession: fromPromise(async ({ input }: { input: { accessToken: string | null; refreshToken: string | null } }) => {
+            const { accessToken, refreshToken } = input;
             
             // If no token in localStorage, session is invalid
             if (!accessToken) {
@@ -37,7 +43,26 @@ const authMachine = setup({
             try { // Call the API to verify the session
                 const response = await checkSessionApi(accessToken);
                 return response;
-            } catch (error) { // If API call fails, session is invalid
+            } catch (error: unknown) { // If API call fails, check if it's a 401 and try to refresh
+                if (error instanceof Error && 'statusCode' in error) {
+                    const errorWithStatus = error as Error & { statusCode?: number };
+                    if (errorWithStatus.statusCode === 401 && refreshToken) {
+                        try { // Try to refresh the access token
+                            const refreshResponse = await refreshAccessTokenApi(refreshToken);
+                            
+                            localStorage.setItem('accessToken', refreshResponse.accessToken);
+                            
+                            const newResponse = await checkSessionApi(refreshResponse.accessToken);
+                            return {
+                                ...newResponse,
+                                accessToken: refreshResponse.accessToken,
+                            };
+                        } catch (refreshError) {
+                            throw refreshError;
+                        }
+                    }
+                }
+                // If it's not a 401 or refresh failed, throw the original error
                 throw error;
             }
         }),
@@ -45,17 +70,22 @@ const authMachine = setup({
     actions: {
         storeUserData: assign(({ context, event }) => {
             // When checkSession succeeds, event.output contains the response
-            const output = (event as unknown as { output: { user: User; accessToken: string; } }).output;
+            const output = (event as unknown as { output: { user: User; accessToken: string; refreshToken: string } }).output;
             
             // Update tokens if new ones are provided
             if (output.accessToken) {
                 localStorage.setItem('accessToken', output.accessToken);
             }
 
+            if (output.refreshToken) {
+                localStorage.setItem('refreshToken', output.refreshToken);
+            }
+
             return {
                 ...context,
                 user: output.user,
                 accessToken: output.accessToken || context.accessToken,
+                refreshToken: output.refreshToken || context.refreshToken,
                 isAuthenticated: true,
                 isLoading: false,
             };
@@ -64,21 +94,25 @@ const authMachine = setup({
             if (event.type !== 'SET_AUTHENTICATED') return context;
             
             localStorage.setItem('accessToken', event.accessToken);
+            localStorage.setItem('refreshToken', event.refreshToken);
 
             return {
                 ...context,
                 user: event.user,
                 accessToken: event.accessToken,
+                refreshToken: event.refreshToken,
                 isAuthenticated: true,
                 isLoading: false,
             };
         }),
         clearTokens: assign(({ context }) => {
             localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
 
             return {
                 ...context,
                 accessToken: null,
+                refreshToken: null,
                 user: null,
                 isAuthenticated: false,
                 isLoading: false,
@@ -86,10 +120,12 @@ const authMachine = setup({
         }),
         logout: assign(({ context }) => {
             localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
 
             return {
                 ...context,
                 accessToken: null,
+                refreshToken: null,
                 user: null,
                 isAuthenticated: false,
                 isLoading: false,
@@ -111,7 +147,10 @@ const authMachine = setup({
             entry: assign(({ context }) => ({ ...context, isLoading: true })),
             invoke: {
                 src: "checkSession",
-                input: ({ context }) => ({ accessToken: context.accessToken }),
+                input: ({ context }) => ({ 
+                    accessToken: context.accessToken,
+                    refreshToken: context.refreshToken,
+                }),
                 onDone: {
                     guard: 'isTokenValid',
                     target: 'authenticated',

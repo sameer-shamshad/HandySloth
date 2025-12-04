@@ -2,8 +2,8 @@ import { useTools } from '../context/ToolsProvider';
 import ToolsGrid from '../components/Tools/ToolsGrid';
 
 const PopularPage = () => {
-    const { state } = useTools();
-    const popularTools = state.context.popularTools;
+  const { state } = useTools();
+  const popularTools = state.context.popularTools;
 
   return (
     <div className='h-full'>

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useMachine } from '@xstate/react';
 import { useTools } from '../context/ToolsProvider';
-import { useMyTools } from '../context/MyToolsProvider';
 import { useAppDispatch } from '../store/hooks';
 import { addUserTool } from '../store/features/userReducer';
 import createToolMachine from '../machines/tool-machines/CreateToolMachine';
@@ -48,11 +47,11 @@ const inputClassNames = 'mt-2 w-full rounded-md border border-border-color dark:
 const CreateToolPage = () => {
   const [state, send] = useMachine(createToolMachine);
   const { send: sendTools } = useTools();
-  const { send: sendMyTools } = useMyTools();
   const dispatch = useAppDispatch();
 
   const {
     name,
+    logo,
     category,
     shortDescription,
     fullDetail,
@@ -73,20 +72,14 @@ const CreateToolPage = () => {
         tool: newTool,
       });
       
-      // Add to MyToolMachine (XState machine for user's tools)
-      sendMyTools({
-        type: 'ADD_TOOL',
-        tool: newTool,
-      });
-      
-      // Add to Redux userReducer (for user's tools in Redux state)
-      dispatch(addUserTool(newTool));
+      // Add tool ID to Redux userReducer (for user's tools in Redux state)
+      dispatch(addUserTool(newTool._id));
     }
-  }, [state, sendTools, sendMyTools, dispatch]);
+  }, [state, sendTools, dispatch]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    const validFields: (keyof NewTool)[] = ['name', 'shortDescription', 'fullDetail', 'toolImages', 'category', 'tags', 'links'];
+    const validFields: (keyof NewTool)[] = ['name', 'logo', 'shortDescription', 'fullDetail', 'toolImages', 'category', 'tags', 'links'];
     if (validFields.includes(name as keyof NewTool)) {
       send({ type: "CHANGE_FIELD", field: name as keyof NewTool, value });
     }
@@ -155,6 +148,20 @@ const CreateToolPage = () => {
                         placeholder="Enter tool name"
                         required
                     />
+                </div>
+
+                <div className="flex flex-col">
+                    <label>Tool Logo URL *</label>
+                    <input
+                        name="logo"
+                        type="url"
+                        value={logo || ''}
+                        onChange={handleInputChange}
+                        className={inputClassNames}
+                        placeholder="https://example.com/logo.png"
+                        required
+                    />
+                    <p className="hint mt-1">Enter the URL of the tool's logo image</p>
                 </div>
 
             <div className="flex flex-col gap-3">

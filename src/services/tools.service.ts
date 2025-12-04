@@ -32,6 +32,7 @@ export const createToolMock = (tool: NewTool): Promise<Tool> => {
 }
 interface CreateToolRequest {
   name: string;
+  logo?: string;
   shortDescription?: string;
   fullDetail?: string;
   toolImages?: string[];
@@ -51,6 +52,7 @@ interface CreateToolResponse {
 
 interface CreateToolInput {
   name: string;
+  logo?: string;
   category: string[]; // Array format from machine context
   shortDescription?: string;
   fullDetail?: string;
@@ -86,11 +88,11 @@ export const createTool = async (tool: CreateToolInput): Promise<Tool> => {
 };
 
 interface FetchUserToolsResponse {
-  tools: Tool[];
+  toolIds: string[];
   message: string;
 }
 
-export const fetchUserTools = async (): Promise<Tool[]> => {
+export const fetchUserTools = async (): Promise<string[]> => {
   try {
     const response = await axios.get<FetchUserToolsResponse>('/api/user/tools');
     
@@ -98,7 +100,7 @@ export const fetchUserTools = async (): Promise<Tool[]> => {
       throw new Error(response.data.message || 'Failed to fetch user tools');
     }
 
-    return response.data.tools;
+    return response.data.toolIds || [];
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch user tools');
@@ -152,11 +154,11 @@ export const removeBookmark = async (toolId: string): Promise<BookmarkedTool> =>
 };
 
 interface FetchBookmarkedToolsResponse {
-  tools: Tool[];
+  toolIds: string[];
   message: string;
 }
 
-export const fetchBookmarkedTools = async (): Promise<Tool[]> => {
+export const fetchBookmarkedTools = async (): Promise<string[]> => {
   try {
     const response = await axios.get<FetchBookmarkedToolsResponse>('/api/user/bookmarks');
     
@@ -164,11 +166,38 @@ export const fetchBookmarkedTools = async (): Promise<Tool[]> => {
       throw new Error(response.data.message || 'Failed to fetch bookmarked tools');
     }
 
-    return response.data.tools;
+    return response.data.toolIds || [];
   } catch (error: unknown) {
     console.log('Error fetching bookmarked tools', error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchToolsByIdsResponse {
+  tools: Tool[];
+  message: string;
+}
+
+// Fetch full tool objects by array of tool IDs
+export const fetchToolsByIds = async (toolIds: string[]): Promise<Tool[]> => {
+  try {
+    if (!toolIds || toolIds.length === 0) {
+      return [];
+    }
+    
+    const response = await axios.post<FetchToolsByIdsResponse>('/api/tool/by-ids', { toolIds });
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch tools by IDs');
+    }
+
+    return response.data.tools || [];
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch tools by IDs');
     }
     throw error;
   }

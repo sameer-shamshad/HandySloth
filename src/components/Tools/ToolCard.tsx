@@ -3,26 +3,33 @@ import { useState, memo, useEffect } from 'react';
 import type { Tool } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { addBookmarkedTool, removeBookmarkedTool } from '../../store/features/userReducer';
 import { bookmarkTool, removeBookmark } from '../../services/tools.service';
 
 const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAuth();
   const userId = user?._id;
+  const { bookmarkedTools } = useAppSelector((state) => state.user);
 
   const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
-    return tool?.bookmarks?.includes(userId || '') || false;
+    if (!userId) return false;
+    // Check if tool ID exists in Redux bookmarkedTools array (array of IDs)
+    return bookmarkedTools.includes(tool._id);
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Sync bookmark state when tool or user changes
+  // Sync bookmark state when tool, user, or Redux bookmarkedTools changes
   useEffect(() => {
-    if (userId && Array.isArray(tool?.bookmarks)) {
-      setIsBookmarked(tool.bookmarks.includes(userId));
-    } else {
+    if (!userId) {
       setIsBookmarked(false);
+      return;
     }
-  }, [tool.bookmarks, userId]);
+    // Check if tool ID exists in Redux bookmarkedTools array (array of IDs)
+    setIsBookmarked(bookmarkedTools.includes(tool._id));
+  }, [tool._id, userId, bookmarkedTools]);
 
   const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -47,6 +54,15 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
       const updatedTool = previousBookmarkState
         ? await removeBookmark(tool._id)
         : await bookmarkTool(tool._id);
+     
+      // Update Redux state for real-time updates
+      if (previousBookmarkState) {
+        // Removing bookmark - dispatch remove action with tool ID
+        dispatch(removeBookmarkedTool(tool._id));
+      } else {
+        // Adding bookmark - dispatch add action with tool ID
+        dispatch(addBookmarkedTool(tool._id));
+      }
       
       // Sync with API response
       if (updatedTool && Array.isArray(updatedTool.bookmarks)) {

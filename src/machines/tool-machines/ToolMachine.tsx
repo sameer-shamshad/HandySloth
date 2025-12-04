@@ -14,7 +14,6 @@ export const selectRecentTools = (tools: Tool[], limit = 5) => [...tools].sort((
 export const toolMachine = setup({
   types: {
     context: {} as {
-      tools: Tool[];
       recentTools: Tool[];
       popularTools: Tool[];
       trendingTools: Tool[];
@@ -55,7 +54,6 @@ export const toolMachine = setup({
       if (event.type !== 'FETCH_TOOLS') return context;
 
       return {
-        tools: event.tools,
         recentTools: selectRecentTools(event.tools),
         popularTools: selectPopularTools(event.tools),
         trendingTools: selectTrendingTools(event.tools),
@@ -63,52 +61,79 @@ export const toolMachine = setup({
     }),
     addTool: assign(({ context, event }) => {
       if (event.type !== 'ADD_TOOL') return context;
+      
+      // Check if tool already exists in any array to prevent duplicates
+      const allTools = [...context.recentTools, ...context.trendingTools, ...context.popularTools];
+      const toolExists = allTools.some((t) => t._id === event.tool._id);
+      
+      // If tool already exists anywhere, don't add it again (should use UPDATE_TOOL instead)
+      if (toolExists) {
+        return context; // Return unchanged context, tool should be updated instead
+      }
+      
       // Prepend new tool to recentTools (since it's the most recent)
       const updatedRecentTools = [event.tool, ...context.recentTools];
+      // Combine all tools for sorting popular and trending
+      const allToolsForSorting = [event.tool, ...allTools];
+      
       return {
         ...context,
-        tools: [event.tool, ...context.tools],
         recentTools: updatedRecentTools,
-        popularTools: selectPopularTools([event.tool, ...context.tools]),
-        trendingTools: selectTrendingTools([event.tool, ...context.tools]),
+        popularTools: selectPopularTools(allToolsForSorting),
+        trendingTools: selectTrendingTools(allToolsForSorting),
       };
     }),
     updateTool: assign(({ context, event }) => {
       if (event.type !== 'UPDATE_TOOL') return context;
 
-      const toolToUpdate = context.tools.find((tool) => tool._id === event.tool._id);
-      if (!toolToUpdate) return context;
+      // Check if tool exists in any array (recentTools, trendingTools, popularTools)
+      const allTools = [...context.recentTools, ...context.trendingTools, ...context.popularTools];
+      const toolToUpdate = allTools.find((tool) => tool._id === event.tool._id);
+      if (!toolToUpdate) {
+        // Tool doesn't exist anywhere, treat as add instead
+        return context;
+      }
 
+      // Update the tool with latest data from event
       const updatedTool = { ...toolToUpdate, ...event.tool };
+      
+      // Update tool in all arrays where it exists
       return {
-        tools: context.tools.map((tool) => tool._id === event.tool._id ? updatedTool : tool),
-        recentTools: context.recentTools.map((tool) => tool._id === event.tool._id ? updatedTool : tool),
-        popularTools: context.popularTools.map((tool) => tool._id === event.tool._id ? updatedTool : tool),
-        trendingTools: context.trendingTools.map((tool) => tool._id === event.tool._id ? updatedTool : tool),
+        recentTools: context.recentTools.some((t) => t._id === event.tool._id)
+          ? context.recentTools.map((tool) => tool._id === event.tool._id ? updatedTool : tool)
+          : context.recentTools,
+        popularTools: context.popularTools.some((t) => t._id === event.tool._id)
+          ? context.popularTools.map((tool) => tool._id === event.tool._id ? updatedTool : tool)
+          : context.popularTools,
+        trendingTools: context.trendingTools.some((t) => t._id === event.tool._id)
+          ? context.trendingTools.map((tool) => tool._id === event.tool._id ? updatedTool : tool)
+          : context.trendingTools,
       };
     }),
     deleteTool: assign(({ context, event }) => {
       if (event.type !== 'DELETE_TOOL') return context;
 
-      const toolToDelete = context.tools.find((tool) => tool._id === event.id);
+      // Check if tool exists in any array
+      const allTools = [...context.recentTools, ...context.trendingTools, ...context.popularTools];
+      const toolToDelete = allTools.find((tool) => tool._id === event.id);
       if (!toolToDelete) return context;
 
       return {
-        tools: context.tools.filter((tool) => tool._id !== event.id),
-        recentTools: context.recentTools.filter((tool) => tool._id !== toolToDelete._id),
-        popularTools: context.popularTools.filter((tool) => tool._id !== toolToDelete._id),
-        trendingTools: context.trendingTools.filter((tool) => tool._id !== toolToDelete._id),
+        recentTools: context.recentTools.filter((tool) => tool._id !== event.id),
+        popularTools: context.popularTools.filter((tool) => tool._id !== event.id),
+        trendingTools: context.trendingTools.filter((tool) => tool._id !== event.id),
       };
     }),
     incrementView: assign(({ context, event }) => {
       if (event.type !== 'INCREMENT_VIEW') return context;
 
-      const toolToUpdate = context.tools.find((tool) => tool._id === event.id);
+      // Check if tool exists in any array
+      const allTools = [...context.recentTools, ...context.trendingTools, ...context.popularTools];
+      const toolToUpdate = allTools.find((tool) => tool._id === event.id);
       if (!toolToUpdate) return context;
 
       const updatedTool = { ...toolToUpdate, views: toolToUpdate.views + 1 };
       return {
-        tools: context.tools.map((tool) => tool._id === event.id ? updatedTool : tool),
         recentTools: context.recentTools.map((tool) => tool._id === event.id ? updatedTool : tool),
         popularTools: context.popularTools.map((tool) => tool._id === event.id ? updatedTool : tool),
         trendingTools: context.trendingTools.map((tool) => tool._id === event.id ? updatedTool : tool),
@@ -119,7 +144,6 @@ export const toolMachine = setup({
   id: 'toolMachine',
   initial: 'loading',
   context: {
-    tools: [],
     recentTools: [],
     popularTools: [],
     trendingTools: [],

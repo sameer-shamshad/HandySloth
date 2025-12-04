@@ -1,19 +1,19 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ToolList from '../components/Profile/ToolList';
-import { useMyTools } from '../context/MyToolsProvider';
 import { useTools } from '../context/ToolsProvider';
 import ProfileCard from '../components/Profile/ProfileCard';
 import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { fetchBookmarkedToolsThunk } from '../store/features/userReducer';
+import { fetchUserToolsThunk, fetchBookmarkedToolsThunk } from '../store/features/userReducer';
+import { fetchToolsByIds } from '../services/tools.service';
 import { useAuth } from '../hooks/useAuth';
 
 const profileStats = [
   {
     icon: "tools",
     label: 'Tools',
-    value: 0, // Will be updated from MyToolMachine
+    value: 0, // Will be updated from Redux userReducer
   },
   {
     icon: "bookmarks",
@@ -36,21 +36,49 @@ const DashboardPage = () => {
   const isLoading = false; // Set to true when fetching data
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { state: myToolsState } = useMyTools();
   const { state: toolsState } = useTools();
   const { isAuthenticated } = useAuth();
-  const { bookmarkedTools, isLoadingBookmarks } = useAppSelector((state) => state.user);
+  const { tools: userToolIds, bookmarkedTools: bookmarkedToolIds, isLoadingBookmarks } = useAppSelector((state) => state.user);
+  const [bookmarkedToolsForDisplay, setBookmarkedToolsForDisplay] = useState<Array<{ name: string; logo: string }>>([]);
 
-  // Fetch bookmarked tools if user is authenticated but tools haven't been fetched
+  // Fetch user tools and bookmarked tools if user is authenticated but IDs haven't been fetched
   useEffect(() => {
-    if (isAuthenticated && bookmarkedTools.length === 0 && !isLoadingBookmarks) {
-      dispatch(fetchBookmarkedToolsThunk());
+    if (isAuthenticated) {
+      if (userToolIds.length === 0) {
+        dispatch(fetchUserToolsThunk());
+      }
+      if (bookmarkedToolIds.length === 0 && !isLoadingBookmarks) {
+        dispatch(fetchBookmarkedToolsThunk());
+      }
     }
-  }, [isAuthenticated, bookmarkedTools.length, isLoadingBookmarks, dispatch]);
+  }, [isAuthenticated, userToolIds.length, bookmarkedToolIds.length, isLoadingBookmarks, dispatch]);
 
-  const userTools = myToolsState.context.tools;
-  const toolsCount = userTools.length;
-  const bookmarksCount = bookmarkedTools.length;
+  // Fetch first 5 bookmarked tools for display
+  useEffect(() => {
+    const fetchBookmarksForDisplay = async () => {
+      if (bookmarkedToolIds.length === 0) {
+        setBookmarkedToolsForDisplay([]);
+        return;
+      }
+
+      try {
+        const firstFiveIds = bookmarkedToolIds.slice(0, 5);
+        const tools = await fetchToolsByIds(firstFiveIds);
+        setBookmarkedToolsForDisplay(tools.map(tool => ({
+          name: tool.name,
+          logo: tool.logo,
+        })));
+      } catch (error) {
+        console.error('Failed to fetch bookmarked tools for display:', error);
+        setBookmarkedToolsForDisplay([]);
+      }
+    };
+
+    fetchBookmarksForDisplay();
+  }, [bookmarkedToolIds]);
+
+  const toolsCount = userToolIds.length;
+  const bookmarksCount = bookmarkedToolIds.length;
 
   // Update tools count and bookmarks count dynamically
   const updatedProfileStats = profileStats.map(stat => {
@@ -62,12 +90,6 @@ const DashboardPage = () => {
     }
     return stat;
   });
-
-  // Get first 5 bookmarked tools for display
-  const myBookmarks = bookmarkedTools.slice(0, 5).map(tool => ({
-    name: tool.name,
-    logo: tool.logo,
-  }));
 
   // Get recent tools from ToolMachine (first 5 for recently viewed)
   const recentlyViewed = toolsState.context.recentTools.slice(0, 5).map(tool => ({
@@ -110,7 +132,7 @@ const DashboardPage = () => {
             </div>
         </div>
 
-        <ToolList tools={myBookmarks} label="My Bookmarks" />
+        <ToolList tools={bookmarkedToolsForDisplay} label="My Bookmarks" />
         <ToolList tools={recentlyViewed} label="Recently Viewed" />
 
         <div className='flex flex-col gap-0 text-secondary-color'>
@@ -119,8 +141,8 @@ const DashboardPage = () => {
 
             <div className='flex items-center gap-2 mt-2'>
                 {
-                    Array.from({ length: 5 }).map(() => (
-                        <span className='material-symbols-outlined'>star</span>
+                    Array.from({ length: 5 }).map((_, index) => (
+                        <span key={`star-${index}`} className='material-symbols-outlined'>star</span>
                     ))
                 }
             </div>

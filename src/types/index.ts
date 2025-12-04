@@ -57,7 +57,7 @@ export interface Tool {
   };
 }
 
-export type NewTool = Omit<Tool, '_id' | 'views' | 'createdAt' | 'updatedAt' | 'bookmarks' | 'logo'>;
+export type NewTool = Omit<Tool, '_id' | 'views' | 'createdAt' | 'updatedAt' | 'bookmarks'>;
 
 export type Contact = {
   firstName: string;

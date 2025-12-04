@@ -12,8 +12,10 @@ const ToolViewPage = () => {
   const { id } = useParams();
   const { state, send } = useTools();
   const { tools: userTools } = useAppSelector((state) => state.user);
-  const tools = state.context.tools;
-  const tool = tools.find((tool: Tool) => tool._id === id);
+  // Get tool from any of the arrays (recentTools, trendingTools, popularTools)
+  const { recentTools, trendingTools, popularTools } = state.context;
+  const allTools = [...recentTools, ...trendingTools, ...popularTools];
+  const tool = allTools.find((tool: Tool) => tool._id === id);
   
   const [isLoading, setIsLoading] = useState<boolean>(true); // Start with loading - will fetch on mount
   const [fetchError, setFetchError] = useState<boolean>(false);
@@ -38,9 +40,10 @@ const ToolViewPage = () => {
         
         if (isCancelled) return;
         
-        // Check if tool exists in current machine state
-        const currentTools = state.context.tools;
-        const toolExists = currentTools.some((t) => t._id === fetchedTool._id);
+        // Check if tool exists in any of the machine arrays (recentTools, trendingTools, popularTools)
+        const { recentTools, trendingTools, popularTools } = state.context;
+        const allTools = [...recentTools, ...trendingTools, ...popularTools];
+        const toolExists = allTools.some((t) => t._id === fetchedTool._id);
         
         if (toolExists) { // Tool exists in machine, update it with latest data
           send({ type: 'UPDATE_TOOL', tool: fetchedTool });

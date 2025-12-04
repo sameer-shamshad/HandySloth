@@ -1,7 +1,7 @@
 import axios from '../lib/axios';
 import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import type { NewTool, Tool } from '../types';
+import type { NewTool, Tool, User } from '../types';
 import { tools as seedTools } from '../dummy-data/tools';
 
 export const fetchToolsMock = (): Promise<Tool[]> => {
@@ -24,12 +24,12 @@ export const createToolMock = (tool: NewTool): Promise<Tool> => {
         bookmarks: [],
         createdAt: now,
         updatedAt: now,
+        logo: '',
       }
       resolve(clonedTool as Tool);
     }, 3000);
   });
 }
-
 interface CreateToolRequest {
   name: string;
   shortDescription?: string;

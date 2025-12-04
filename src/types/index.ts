@@ -48,7 +48,7 @@ export interface Tool {
   views: number;
   createdAt: string;
   updatedAt: string;
-  bookmarks: number;
+  bookmarks: User["_id"][];
   logo: string;
   links: SocialLinks;
 }

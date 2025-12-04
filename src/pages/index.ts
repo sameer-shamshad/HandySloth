@@ -1,5 +1,6 @@
-export { default as ToolViewPage } from './ToolView';
 export { default as HomePage } from './Home';
+export { default as ToolViewPage } from './ToolView';
+export { default as MyToolsPage } from './MyTools';
 export { default as ContactPage } from './Contact';
 export { default as PopularPage } from './Popular';
 export { default as TrendingPage } from './Trending';

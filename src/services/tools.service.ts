@@ -21,7 +21,7 @@ export const createToolMock = (tool: NewTool): Promise<Tool> => {
         _id: uuidv4(),
         ...tool,
         views: 0,
-        bookmarks: 0,
+        bookmarks: [],
         createdAt: now,
         updatedAt: now,
       }
@@ -80,6 +80,72 @@ export const createTool = async (tool: CreateToolInput): Promise<Tool> => {
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to create tool');
+    }
+    throw error;
+  }
+};
+
+interface FetchUserToolsResponse {
+  tools: Tool[];
+  message: string;
+}
+
+export const fetchUserTools = async (): Promise<Tool[]> => {
+  try {
+    const response = await axios.get<FetchUserToolsResponse>('/api/user/tools');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch user tools');
+    }
+
+    return response.data.tools;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch user tools');
+    }
+    throw error;
+  }
+};
+
+interface BookmarkedTool {
+  _id: string;
+  bookmarks: User["_id"][];
+}
+
+interface BookmarkResponse {
+  message: string;
+  tool: BookmarkedTool;
+}
+
+export const bookmarkTool = async (toolId: string): Promise<BookmarkedTool> => {
+  try {
+    const response = await axios.post<BookmarkResponse>(`/api/tool/${toolId}/bookmark`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to bookmark tool');
+    }
+
+    return response.data.tool;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to bookmark tool');
+    }
+    throw error;
+  }
+};
+
+export const removeBookmark = async (toolId: string): Promise<BookmarkedTool> => {
+  try {
+    const response = await axios.delete<BookmarkResponse>(`/api/tool/${toolId}/bookmark`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to remove bookmark');
+    }
+
+    return response.data.tool;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to remove bookmark');
     }
     throw error;
   }

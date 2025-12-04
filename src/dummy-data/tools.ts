@@ -11,7 +11,7 @@ export const tools: Tool[] = [
     views: 24500,
     createdAt: '2025-01-14T10:00:00Z',
     updatedAt: '2025-01-14T10:00:00Z',
-    bookmarks: 125,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=C',
     toolImages: ['https://placehold.co/800x400?text=Crypto+Calendar'],
     links: {
@@ -30,7 +30,7 @@ export const tools: Tool[] = [
     views: 30250,
     createdAt: '2024-12-21T15:30:00Z',
     updatedAt: '2024-12-21T15:30:00Z',
-    bookmarks: 180,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=C3',
     toolImages: ['https://placehold.co/800x400?text=Coin360+Heatmap'],
     links: {
@@ -49,7 +49,7 @@ export const tools: Tool[] = [
     views: 35120,
     createdAt: '2025-01-10T09:20:00Z',
     updatedAt: '2025-01-10T09:20:00Z',
-    bookmarks: 210,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=CP',
     toolImages: ['https://placehold.co/800x400?text=CryptoPanic+News'],
     links: {
@@ -68,7 +68,7 @@ export const tools: Tool[] = [
     views: 8700,
     createdAt: '2025-01-18T19:45:00Z',
     updatedAt: '2025-01-18T19:45:00Z',
-    bookmarks: 45,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=CM',
     toolImages: ['https://placehold.co/800x400?text=CryptoMiso'],
     links: {
@@ -87,7 +87,7 @@ export const tools: Tool[] = [
     views: 21000,
     createdAt: '2024-11-30T13:05:00Z',
     updatedAt: '2024-11-30T13:05:00Z',
-    bookmarks: 95,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=TCP',
     toolImages: ['https://placehold.co/800x400?text=Coin+Perspective'],
     links: {
@@ -106,7 +106,7 @@ export const tools: Tool[] = [
     views: 32950,
     createdAt: '2025-01-16T08:10:00Z',
     updatedAt: '2025-01-16T08:10:00Z',
-    bookmarks: 165,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=DG',
     toolImages: ['https://placehold.co/800x400?text=DexGuru'],
     links: {
@@ -125,7 +125,7 @@ export const tools: Tool[] = [
     views: 43000,
     createdAt: '2024-10-11T11:11:00Z',
     updatedAt: '2024-10-11T11:11:00Z',
-    bookmarks: 320,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=DL',
     toolImages: ['https://placehold.co/800x400?text=DefiLlama'],
     links: {
@@ -144,7 +144,7 @@ export const tools: Tool[] = [
     views: 28000,
     createdAt: '2025-01-12T17:25:00Z',
     updatedAt: '2025-01-12T17:25:00Z',
-    bookmarks: 140,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=TT',
     toolImages: ['https://placehold.co/800x400?text=Token+Terminal'],
     links: {
@@ -163,7 +163,7 @@ export const tools: Tool[] = [
     views: 51200,
     createdAt: '2024-09-15T14:20:00Z',
     updatedAt: '2024-09-15T14:20:00Z',
-    bookmarks: 450,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=N',
     toolImages: ['https://placehold.co/800x400?text=Nansen'],
     links: {
@@ -182,7 +182,7 @@ export const tools: Tool[] = [
     views: 189000,
     createdAt: '2024-08-05T10:00:00Z',
     updatedAt: '2024-08-05T10:00:00Z',
-    bookmarks: 2800,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=MM',
     toolImages: ['https://placehold.co/800x400?text=MetaMask'],
     links: {
@@ -201,7 +201,7 @@ export const tools: Tool[] = [
     views: 125000,
     createdAt: '2024-07-22T16:45:00Z',
     updatedAt: '2024-07-22T16:45:00Z',
-    bookmarks: 1520,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=OS',
     toolImages: ['https://placehold.co/800x400?text=OpenSea'],
     links: {
@@ -220,7 +220,7 @@ export const tools: Tool[] = [
     views: 156000,
     createdAt: '2024-06-10T09:30:00Z',
     updatedAt: '2024-06-10T09:30:00Z',
-    bookmarks: 2100,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=ES',
     toolImages: ['https://placehold.co/800x400?text=Etherscan'],
     links: {
@@ -239,7 +239,7 @@ export const tools: Tool[] = [
     views: 198000,
     createdAt: '2024-05-18T11:15:00Z',
     updatedAt: '2024-05-18T11:15:00Z',
-    bookmarks: 3400,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=UNI',
     toolImages: ['https://placehold.co/800x400?text=Uniswap'],
     links: {
@@ -258,7 +258,7 @@ export const tools: Tool[] = [
     views: 28900,
     createdAt: '2025-01-20T13:50:00Z',
     updatedAt: '2025-01-20T13:50:00Z',
-    bookmarks: 88,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=CK',
     toolImages: ['https://placehold.co/800x400?text=CertiK'],
     links: {
@@ -277,7 +277,7 @@ export const tools: Tool[] = [
     views: 47800,
     createdAt: '2024-12-05T08:25:00Z',
     updatedAt: '2024-12-05T08:25:00Z',
-    bookmarks: 275,
+    bookmarks: [],
     logo: 'https://placehold.co/64x64?text=GN',
     toolImages: ['https://placehold.co/800x400?text=Glassnode'],
     links: {

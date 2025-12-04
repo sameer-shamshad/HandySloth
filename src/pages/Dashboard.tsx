@@ -1,21 +1,23 @@
-import ProfileCard from '../components/Profile/ProfileCard';
-import ToolList from '../components/Profile/ToolList';
-import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
 import { tools } from '../dummy-data/tools';
+import { useNavigate } from 'react-router-dom';
+import ToolList from '../components/Profile/ToolList';
+import { useMyTools } from '../context/MyToolsProvider';
+import ProfileCard from '../components/Profile/ProfileCard';
+import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
 
 const profileStats = [
   {
-    icon: "tool",
+    icon: "tools",
     label: 'Tools',
-    value: 5,
+    value: 0, // Will be updated from MyToolMachine
   },
   {
-    icon: "bookmark",
+    icon: "bookmarks",
     label: 'Bookmarks',
     value: 10,
   },
   {
-    icon: "vote",
+    icon: "votes",
     label: 'Votes',
     value: 23,
   },
@@ -28,6 +30,16 @@ const profileStats = [
 
 const DashboardPage = () => {
   const isLoading = false; // Set to true when fetching data
+  const navigate = useNavigate();
+  const { state: myToolsState } = useMyTools();
+
+  const userTools = myToolsState.context.tools;
+  const toolsCount = userTools.length;
+
+  // Update tools count dynamically
+  const updatedProfileStats = profileStats.map(stat => 
+    stat.icon === "tools" ? { ...stat, value: toolsCount } : stat
+  );
 
   // Get first 5 tools for bookmarks and next 5 for recently viewed
   const myBookmarks = tools.slice(0, 5).map(tool => ({
@@ -52,13 +64,14 @@ const DashboardPage = () => {
                         Array.from({ length: 4 }).map((_, index) => (
                             <ProfileStatsCardSkeleton key={`stats-skeleton-${index}`} />
                         ))
-                    ) : profileStats.length > 0 ? (
-                        profileStats.map((stat) => (
+                    ) : updatedProfileStats.length > 0 ? (
+                        updatedProfileStats.map((stat) => (
                             <ProfileStatsCard 
                                 key={stat.label} 
                                 label={stat.label} 
                                 value={stat.value} 
                                 iconName={stat.icon as "tools" | "votes" | "bookmarks" | "comments"}
+                                onClick={stat.icon === "tools" ? () => navigate('/my-tools') : undefined}
                             />
                         ))
                     ) : (

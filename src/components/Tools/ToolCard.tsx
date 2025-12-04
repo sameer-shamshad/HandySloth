@@ -1,15 +1,66 @@
 import "bootstrap";
-import { useState, memo } from 'react';
+import { useState, memo, useEffect } from 'react';
 import type { Tool } from '../../types';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthProvider';
+import { bookmarkTool, removeBookmark } from '../../services/tools.service';
 
 const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
   const navigate = useNavigate();
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const { state: authState } = useAuth();
+  const userId = authState.context.user?._id;
 
-  const handleBookmark = (e: React.MouseEvent) => {
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
+    return tool?.bookmarks?.includes(userId || '') || false;
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const isAuthenticated = authState.matches('authenticated');
+
+  // Sync bookmark state when tool or user changes
+  useEffect(() => {
+    if (userId && Array.isArray(tool?.bookmarks)) {
+      setIsBookmarked(tool.bookmarks.includes(userId));
+    } else {
+      setIsBookmarked(false);
+    }
+  }, [tool.bookmarks, userId]);
+
+  const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Only allow bookmarking if user is authenticated
+    if (!isAuthenticated || !userId) {
+      return;
+    }
+
+    // Prevent action if already loading
+    if (isLoading) {
+      return;
+    }
+
+    setIsLoading(true);
+    const previousBookmarkState = isBookmarked;
+
+    // Optimistically update UI
     setIsBookmarked(!isBookmarked);
+
+    try {
+      const updatedTool = previousBookmarkState
+        ? await removeBookmark(tool._id)
+        : await bookmarkTool(tool._id);
+      
+      // Sync with API response
+      if (updatedTool && Array.isArray(updatedTool.bookmarks)) {
+        setIsBookmarked(updatedTool.bookmarks.includes(userId));
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      setIsBookmarked(previousBookmarkState);
+      console.error('Failed to update bookmark:', error);
+      // Optionally show a toast/notification here
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLinkClick = (e: React.MouseEvent) => {
@@ -32,23 +83,27 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
           {tag}
         </span>
 
-        <button 
-          type="button"
-          onClick={handleBookmark}
-          className='h-max! w-max! p-1! text-primary-color ml-auto bg-transparent!'
-        >
-          {
-            isBookmarked ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-bookmark" viewBox="0 0 16 16">
-                <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"/>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-bookmark" viewBox="0 0 16 16">
-                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
-              </svg>
-            )
-          }
-        </button>
+        {isAuthenticated && (
+          <button 
+            type="button"
+            onClick={handleBookmark}
+            disabled={isLoading}
+            className='h-max! w-max! p-1! text-primary-color ml-auto bg-transparent! disabled:opacity-50 disabled:cursor-not-allowed'
+            aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark tool'}
+          >
+            {
+              isBookmarked ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className={isLoading ? "opacity-50" : ""} viewBox="0 0 16 16">
+                  <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className={isLoading ? "opacity-50" : ""} viewBox="0 0 16 16">
+                  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+                </svg>
+              )
+            }
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-3 gap-3 text-xs font-medium mt-auto">

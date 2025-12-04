@@ -166,8 +166,75 @@ export const fetchBookmarkedTools = async (): Promise<Tool[]> => {
 
     return response.data.tools;
   } catch (error: unknown) {
+    console.log('Error fetching bookmarked tools', error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchToolByIdResponse {
+  tool: Tool;
+  message: string;
+}
+
+export const fetchToolById = async (toolId: string): Promise<Tool> => {
+  try {
+    const response = await axios.get<FetchToolByIdResponse>(`/api/tool/${toolId}`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch tool');
+    }
+
+    return response.data.tool;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch tool');
+    }
+    throw error;
+  }
+};
+
+interface FetchRecentToolsResponse {
+  tools: Tool[];
+  message: string;
+}
+
+export const fetchRecentTools = async (): Promise<Tool[]> => {
+  try {
+    const response = await axios.get<FetchRecentToolsResponse>('/api/tool/recent');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch recent tools');
+    }
+
+    return response.data.tools;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch recent tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchTrendingToolsResponse {
+  tools: Tool[];
+  message: string;
+}
+
+export const fetchTrendingTools = async (): Promise<Tool[]> => {
+  try {
+    const response = await axios.get<FetchTrendingToolsResponse>('/api/tool/trending');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch trending tools');
+    }
+
+    return response.data.tools;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch trending tools');
     }
     throw error;
   }

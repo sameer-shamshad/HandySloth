@@ -1,13 +1,9 @@
-import ToolsGrid from '../components/Tools/ToolsGrid';
-import { selectPopularTools } from '../machines/tool-machines/ToolMachine';
-import type { Tool } from '../types';
 import { useTools } from '../context/ToolsProvider';
-
+import ToolsGrid from '../components/Tools/ToolsGrid';
 
 const PopularPage = () => {
     const { state } = useTools();
-    const tools = state.context.tools;
-    const popularTools: Tool[] = selectPopularTools(tools, 20);
+    const popularTools = state.context.popularTools;
 
   return (
     <div className='h-full'>

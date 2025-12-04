@@ -1,9 +1,10 @@
 import type { Tool } from '../../types';
 import { assign, setup, fromPromise } from 'xstate';
-import { fetchToolsMock } from '../../services/tools.service';
+import { fetchRecentTools, fetchTrendingTools } from '../../services/tools.service';
 
 const sortBy = (tools: Tool[], key: 'views') => [...tools].sort((a, b) => b[key] - a[key]);
 
+// Helper functions for backward compatibility (for pages that might still use them)
 export const selectTrendingTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
 export const selectPopularTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
 export const selectRecentTools = (tools: Tool[], limit = 5) => [...tools].sort((a, b) => {
@@ -26,16 +27,27 @@ export const toolMachine = setup({
       | { type: 'INCREMENT_VIEW'; id: string }
   },
   actors: {
-    fetchTools: fromPromise(() => fetchToolsMock()),
+    fetchRecentTools: fromPromise(async () => {
+      const tools = await fetchRecentTools();
+      return tools;
+    }),
+    fetchTrendingTools: fromPromise(async () => {
+      const tools = await fetchTrendingTools();
+      return tools;
+    }),
   },
   actions: {
-    assignFetchedTools: assign(({ event }) => {
+    assignRecentTools: assign(({ event }) => {
       const tools = (event as unknown as { output: Tool[] }).output;
       return {
-        tools,
-        recentTools: selectRecentTools(tools),
-        popularTools: selectPopularTools(tools),
-        trendingTools: selectTrendingTools(tools),
+        recentTools: tools,
+      };
+    }),
+    assignTrendingTools: assign(({ event }) => {
+      const tools = (event as unknown as { output: Tool[] }).output;
+      return {
+        trendingTools: tools,
+        popularTools: tools, // Popular tools use same sorting as trending (by views)
       };
     }),
     fetchTools: assign(({ context, event }) => {
@@ -51,10 +63,12 @@ export const toolMachine = setup({
     }),
     addTool: assign(({ context, event }) => {
       if (event.type !== 'ADD_TOOL') return context;
+      // Prepend new tool to recentTools (since it's the most recent)
+      const updatedRecentTools = [event.tool, ...context.recentTools];
       return {
         ...context,
         tools: [event.tool, ...context.tools],
-        recentTools: selectRecentTools([event.tool, ...context.tools]),
+        recentTools: updatedRecentTools,
         popularTools: selectPopularTools([event.tool, ...context.tools]),
         trendingTools: selectTrendingTools([event.tool, ...context.tools]),
       };
@@ -112,11 +126,31 @@ export const toolMachine = setup({
   },
   states: {
     loading: {
-      invoke: {
-        src: 'fetchTools',
-        onDone: {
-          target: 'idle',
-          actions: 'assignFetchedTools',
+      initial: 'fetchingRecent',
+      states: {
+        fetchingRecent: {
+          invoke: {
+            src: 'fetchRecentTools',
+            onDone: {
+              target: 'fetchingTrending',
+              actions: 'assignRecentTools',
+            },
+            onError: {
+              target: '#toolMachine.idle', // Go to idle even if one fails
+            },
+          },
+        },
+        fetchingTrending: {
+          invoke: {
+            src: 'fetchTrendingTools',
+            onDone: {
+              target: '#toolMachine.idle',
+              actions: 'assignTrendingTools',
+            },
+            onError: {
+              target: '#toolMachine.idle', // Go to idle even if one fails
+            },
+          },
         },
       },
     },

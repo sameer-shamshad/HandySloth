@@ -1,10 +1,13 @@
-import { tools } from '../dummy-data/tools';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import ToolList from '../components/Profile/ToolList';
 import { useMyTools } from '../context/MyToolsProvider';
+import { useTools } from '../context/ToolsProvider';
 import ProfileCard from '../components/Profile/ProfileCard';
 import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
-import { useAppSelector } from '../store/hooks';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { fetchBookmarkedToolsThunk } from '../store/features/userReducer';
+import { useAuth } from '../hooks/useAuth';
 
 const profileStats = [
   {
@@ -32,8 +35,18 @@ const profileStats = [
 const DashboardPage = () => {
   const isLoading = false; // Set to true when fetching data
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { state: myToolsState } = useMyTools();
-  const { bookmarkedTools } = useAppSelector((state) => state.user);
+  const { state: toolsState } = useTools();
+  const { isAuthenticated } = useAuth();
+  const { bookmarkedTools, isLoadingBookmarks } = useAppSelector((state) => state.user);
+
+  // Fetch bookmarked tools if user is authenticated but tools haven't been fetched
+  useEffect(() => {
+    if (isAuthenticated && bookmarkedTools.length === 0 && !isLoadingBookmarks) {
+      dispatch(fetchBookmarkedToolsThunk());
+    }
+  }, [isAuthenticated, bookmarkedTools.length, isLoadingBookmarks, dispatch]);
 
   const userTools = myToolsState.context.tools;
   const toolsCount = userTools.length;
@@ -56,8 +69,8 @@ const DashboardPage = () => {
     logo: tool.logo,
   }));
 
-  // Get next 5 tools for recently viewed (using dummy data for now)
-  const recentlyViewed = tools.slice(5, 10).map(tool => ({
+  // Get recent tools from ToolMachine (first 5 for recently viewed)
+  const recentlyViewed = toolsState.context.recentTools.slice(0, 5).map(tool => ({
     name: tool.name,
     logo: tool.logo,
   }));

@@ -1,27 +1,87 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Tool } from "../types";
 import { useParams } from "react-router-dom";
+import { useAppSelector } from "../store/hooks";
 import ToolImage from "../assets/tool-image.png";
 import { useTools } from "../context/ToolsProvider";
 import ToolNotFound from "../components/Tools/ToolNotFound";
-import ToolDetailedCard from "../components/Tools/ToolDetailedCard";
 import ToolCommunityRatings from "../components/Tools/ToolCommunityRatings";
+import { fetchToolById } from "../services/tools.service";
 
 const ToolViewPage = () => {
   const { id } = useParams();
-  const { state } = useTools();
+  const { state, send } = useTools();
+  const { tools: userTools } = useAppSelector((state) => state.user);
   const tools = state.context.tools;
   const tool = tools.find((tool: Tool) => tool._id === id);
-
+  
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Start with loading - will fetch on mount
+  const [fetchError, setFetchError] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+
+  // Fetch tool by ID from API and update/add to machine
+  useEffect(() => {
+    if (!id) {
+      setFetchError(true);
+      setIsLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const fetchAndUpdateTool = async () => {
+      setFetchError(false);
+      setIsLoading(true);
+      
+      try {
+        const fetchedTool = await fetchToolById(id);
+        
+        if (isCancelled) return;
+        
+        // Check if tool exists in current machine state
+        const currentTools = state.context.tools;
+        const toolExists = currentTools.some((t) => t._id === fetchedTool._id);
+        
+        if (toolExists) { // Tool exists in machine, update it with latest data
+          send({ type: 'UPDATE_TOOL', tool: fetchedTool });
+        } else { // Tool doesn't exist in machine, add it
+          send({ type: 'ADD_TOOL', tool: fetchedTool });
+        }
+        
+        setFetchError(false);
+      } catch (error) {
+        if (!isCancelled) {
+          console.error('Failed to fetch tool:', error);
+          setFetchError(true);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchAndUpdateTool();
+    
+    return () => {
+      isCancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]); // Only fetch when id changes
 
   const handleBookmark = () => {
     setIsBookmarked((prev) => !prev);
   };
 
-  // if (!tool) {
-  //     return <ToolNotFound />;
-  // }
+  // Show error only if fetch failed and we're not loading
+  if (fetchError && !isLoading && !tool) {
+    return <ToolNotFound />;
+  }
+  
+  // Show loading while fetching or if tool not found yet (will be found after fetch completes)
+  if (isLoading || !tool) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,28 +117,28 @@ const ToolViewPage = () => {
               {tool?.name || "Open AI"}
             </h3>
             <p className="text-sm text-secondary-color -mt-2">
-              {tool?.shortDescription || "Tool Description"}
+              {tool?.category.join(', ')}
             </p>
           </div>
 
           <div
             className="flex items-center gap-1 lg:gap-3 ml-auto *:p-1 *:bg-main-color! *:dark:bg-primary-bg! *:dark:text-primary-color! *:text-black-color! 
-                        *:rounded-full! *:border-white! *:border *:lg:p-2! *:xl:dark:shadow-[0_0_10px_0.1px_#A9ECEC]! *:xl:shadow-none! [&>a>h4]:hidden! 
-                        xl:[&>a>span]:hidden! xl:[&>a>h4]:block! xl:[&>a>h4]:text-sm! xl:[&>a>h4]:font-extralight! xl:[&>a>h4]:text-primary-color! xl:[&>a]:px-4!"
+            *:rounded-full! *:border-white! *:border *:lg:p-2! *:xl:dark:shadow-[0_0_10px_0.1px_#A9ECEC]! *:xl:shadow-none! [&>a>h4]:hidden! 
+            xl:[&>a>span]:hidden! xl:[&>a>h4]:block! xl:[&>a>h4]:text-sm! xl:[&>a>h4]:font-extralight! xl:[&>a>h4]:text-primary-color! xl:[&>a]:px-4!"
           >
-            {!tool?.links.telegram && (
+            {tool?.links.telegram && (
               <a href={tool?.links.telegram || "#"}>
                 <span>{socialIcons.telegram}</span>
                 <h4>Telegram</h4>
               </a>
             )}
-            {!tool?.links.x && (
+            {tool?.links.x && (
               <a href={tool?.links.x || "#"}>
                 <span>{socialIcons.X}</span>
                 <h4>X</h4>
               </a>
             )}
-            {!tool?.links.website && (
+            {tool?.links.website && (
               <a href={tool?.links.website || "#"}>
                 <span>{socialIcons.website}</span>
                 <h4>Website</h4>
@@ -127,7 +187,7 @@ const ToolViewPage = () => {
               more_vert
             </button>
           </div>
-        </div>{" "}
+        </div>
         {/* Tool Info */}
         <div className="flex flex-col">
           <h4 className="w-max text-sm text-primary-color bg-group-bg rounded-tl-xl rounded-tr-xl px-4 py-1">
@@ -141,12 +201,12 @@ const ToolViewPage = () => {
                   ? tool.logo
                   : "https://mrvian.com/wp-content/uploads/2023/02/logo-open-ai.png"
               }
-              alt={tool?.name || "Tool Logo"}
+              alt={tool?.name}
               className="w-9 h-9 object-cover rounded-full text-primary-color"
             />
 
             <h3 className="text-sm truncate! font-bold text-primary-color">
-              {tool?.name || "Muhammad Zuhaib-ullah Hassan"}
+              {tool?.author?.username}
             </h3>
 
             <div className="flex items-center gap-1 text-primary-color text-xs lg:ml-5">
@@ -160,7 +220,7 @@ const ToolViewPage = () => {
               >
                 <path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3q0-.405-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708M3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z" />
               </svg>
-              <span className="w-max">1 tool</span>
+              <span className="w-max">{userTools.length} tool{userTools.length > 1 ? 's' : ''}</span>
             </div>
 
             <div className="flex items-center gap-1 lg:gap-2 text-primary-color text-xs ml-auto">
@@ -178,10 +238,7 @@ const ToolViewPage = () => {
             </div>
           </div>
         </div>
-        <p className="text-xs text-secondary-color">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry.
-        </p>
+        <p className="text-xs text-secondary-color">{tool?.shortDescription}</p>
       </main>
 
       <main className="flex flex-col xl:flex-row gap-6 bg-primary-bg xl:bg-transparent px-3 xl:-mx-6 py-8 rounded-3xl">

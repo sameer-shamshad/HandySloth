@@ -1,14 +1,12 @@
 import ToolsOverviewList from './ToolsOverviewList';
 import { useTools } from '../../context/ToolsProvider';
-import { selectTrendingTools, selectPopularTools, selectRecentTools } from '../../machines/tool-machines/ToolMachine';
 
 const ToolsOverview = () => {
   const { state } = useTools();
-  const tools = state.context.tools;
 
-  const trendingTools = selectTrendingTools(tools);
-  const popularTools = selectPopularTools(tools);
-  const recentTools = selectRecentTools(tools);
+  const trendingTools = state.context.trendingTools;
+  const popularTools = state.context.popularTools;
+  const recentTools = state.context.recentTools;
 
   return (
     <>

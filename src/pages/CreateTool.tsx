@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { useMachine } from '@xstate/react';
 import { useTools } from '../context/ToolsProvider';
+import { useMyTools } from '../context/MyToolsProvider';
+import { useAppDispatch } from '../store/hooks';
+import { addUserTool } from '../store/features/userReducer';
 import createToolMachine from '../machines/tool-machines/CreateToolMachine';
 import type { ToolCategory, ToolTag, NewTool } from '../types';
 import AttachImages from '../components/ui/AttachImages';
@@ -45,6 +48,8 @@ const inputClassNames = 'mt-2 w-full rounded-md border border-border-color dark:
 const CreateToolPage = () => {
   const [state, send] = useMachine(createToolMachine);
   const { send: sendTools } = useTools();
+  const { send: sendMyTools } = useMyTools();
+  const dispatch = useAppDispatch();
 
   const {
     name,
@@ -57,15 +62,27 @@ const CreateToolPage = () => {
     error,
   } = state.context;
 
-  // Notify ToolsProvider when tool is created successfully
+  // Notify all providers when tool is created successfully
   useEffect(() => {
     if (state.matches('success') && state.context.toolResponse) {
+      const newTool = state.context.toolResponse;
+      
+      // Add to ToolMachine (for recent/trending tools)
       sendTools({
         type: 'ADD_TOOL',
-        tool: state.context.toolResponse,
+        tool: newTool,
       });
+      
+      // Add to MyToolMachine (XState machine for user's tools)
+      sendMyTools({
+        type: 'ADD_TOOL',
+        tool: newTool,
+      });
+      
+      // Add to Redux userReducer (for user's tools in Redux state)
+      dispatch(addUserTool(newTool));
     }
-  }, [state, sendTools]);
+  }, [state, sendTools, sendMyTools, dispatch]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;

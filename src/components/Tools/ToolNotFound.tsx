@@ -9,7 +9,7 @@ const ToolNotFound = () => {
             <p className='text-sm text-primary-color pb-12'>The tool you are looking for does not exist or has been removed.</p>
             <button 
                 type='button'
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/dashboard')}
                 className='bg-main-color! text-black-color! px-8! py-2! rounded-full!'
             >
                 Go Back Home

@@ -1,8 +1,20 @@
+import { useEffect } from 'react';
 import ToolsGrid from '../components/Tools/ToolsGrid';
-import { useAppSelector } from '../store/hooks';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { fetchBookmarkedToolsThunk } from '../store/features/userReducer';
+import { useAuth } from '../hooks/useAuth';
 
 const MyBookmarksPage = () => {
-    const { bookmarkedTools } = useAppSelector((state) => state.user);
+    const dispatch = useAppDispatch();
+    const { isAuthenticated } = useAuth();
+    const { bookmarkedTools, isLoadingBookmarks } = useAppSelector((state) => state.user);
+
+    // Fetch bookmarked tools if user is authenticated but tools haven't been fetched
+    useEffect(() => {
+        if (isAuthenticated && bookmarkedTools.length === 0 && !isLoadingBookmarks) {
+            dispatch(fetchBookmarkedToolsThunk());
+        }
+    }, [isAuthenticated, bookmarkedTools.length, isLoadingBookmarks, dispatch]);
 
     return (
       <div className='h-full'>

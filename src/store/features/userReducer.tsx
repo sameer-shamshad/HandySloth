@@ -1,7 +1,7 @@
 import { logoutThunk } from "./AuthReducer";
 import type { Tool } from "../../types";
 import type { RootState, AppDispatch } from "../store";
-import { createReducer, createAsyncThunk } from "@reduxjs/toolkit";
+import { createReducer, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import { fetchUserTools, fetchBookmarkedTools } from "../../services/tools.service";
 
 type UserState = {
@@ -71,6 +71,9 @@ export const fetchBookmarkedToolsThunk = createAsyncThunk<
   }
 );
 
+// Action to add a tool to user's tools (optimistic update)
+export const addUserTool = createAction<Tool>('user/addTool');
+
 const userReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(fetchUserToolsThunk.pending, (state) => {
@@ -99,6 +102,14 @@ const userReducer = createReducer(initialState, (builder) => {
     .addCase(fetchBookmarkedToolsThunk.rejected, (state, action) => {
       state.isLoadingBookmarks = false;
       state.bookmarksError = action.payload || 'Failed to fetch bookmarked tools';
+    })
+    // Add tool to user's tools (optimistic update)
+    .addCase(addUserTool, (state, action) => {
+      const newTool = action.payload;
+      const existingTool = state.tools.find(tool => tool._id === newTool._id);
+      if (!existingTool) {
+        state.tools = [newTool, ...state.tools];
+      }
     })
     // Clear user data on logout
     .addCase(logoutThunk.fulfilled, (state) => {

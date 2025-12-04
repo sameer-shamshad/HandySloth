@@ -51,6 +51,10 @@ export interface Tool {
   bookmarks: User["_id"][];
   logo: string;
   links: SocialLinks;
+  author?: {
+    _id: string;
+    username: string;
+  };
 }
 
 export type NewTool = Omit<Tool, '_id' | 'views' | 'createdAt' | 'updatedAt' | 'bookmarks' | 'logo'>;

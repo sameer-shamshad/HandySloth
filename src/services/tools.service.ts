@@ -150,3 +150,25 @@ export const removeBookmark = async (toolId: string): Promise<BookmarkedTool> =>
     throw error;
   }
 };
+
+interface FetchBookmarkedToolsResponse {
+  tools: Tool[];
+  message: string;
+}
+
+export const fetchBookmarkedTools = async (): Promise<Tool[]> => {
+  try {
+    const response = await axios.get<FetchBookmarkedToolsResponse>('/api/user/bookmarks');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch bookmarked tools');
+    }
+
+    return response.data.tools;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
+    }
+    throw error;
+  }
+};

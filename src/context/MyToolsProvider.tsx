@@ -1,9 +1,9 @@
-import { useMachine } from '@xstate/react';
+import { useAuth } from './index';
 import { useEffect } from 'react';
+import { useMachine } from '@xstate/react';
 import type { EventFrom, StateFrom } from 'xstate';
 import myToolMachine from '../machines/tool-machines/MyToolMachine';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { useAuth } from './AuthProvider';
 
 type MyToolsContextValue = {
   state: StateFrom<typeof myToolMachine>;
@@ -13,17 +13,17 @@ type MyToolsContextValue = {
 const MyToolsContext = createContext<MyToolsContextValue | undefined>(undefined);
 
 export const MyToolsProvider = ({ children }: { children: ReactNode }) => {
-  const { state: authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [state, send] = useMachine(myToolMachine);
 
-  // Watch AuthMachine state and trigger MyToolMachine events
+  // Watch Redux auth state and trigger MyToolMachine events
   useEffect(() => {
-    if (authState.matches('authenticated')) { // User is authenticated - fetch their tools
+    if (isAuthenticated) { // User is authenticated - fetch their tools
       send({ type: 'USER_AUTHENTICATED' });
-    } else if (authState.matches('unauthenticated')) { // User logged out - clear tools
+    } else { // User logged out - clear tools
       send({ type: 'USER_LOGGED_OUT' });
     }
-  }, [authState, send]);
+  }, [isAuthenticated, send]);
 
   const value = useMemo(() => {
     return { state, send };

@@ -34,7 +34,7 @@ const authMachine = setup({
     actors: {
         checkSession: fromPromise(async ({ input }: { input: { accessToken: string | null; refreshToken: string | null } }) => {
             const { accessToken, refreshToken } = input;
-            
+           
             // If no token in localStorage, session is invalid
             if (!accessToken) {
                 throw new Error('No access token found');

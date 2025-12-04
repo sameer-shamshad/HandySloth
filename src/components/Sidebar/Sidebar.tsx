@@ -17,9 +17,7 @@ interface NavItem {
 
 const Sidebar = () => {
   const { openModal } = useModal();
-  const { state: authState } = useAuth();
-
-  const isAuthenticated = authState.matches('authenticated');
+  const { isAuthenticated } = useAuth();
   
   const getInitialDarkMode = () => {
     if (typeof window === 'undefined') return false;

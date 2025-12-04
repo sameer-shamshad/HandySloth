@@ -2,19 +2,18 @@ import "bootstrap";
 import { useState, memo, useEffect } from 'react';
 import type { Tool } from '../../types';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthProvider';
+import { useAuth } from '../../context';
 import { bookmarkTool, removeBookmark } from '../../services/tools.service';
 
 const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
   const navigate = useNavigate();
-  const { state: authState } = useAuth();
-  const userId = authState.context.user?._id;
+  const { user, isAuthenticated } = useAuth();
+  const userId = user?._id;
 
   const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
     return tool?.bookmarks?.includes(userId || '') || false;
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const isAuthenticated = authState.matches('authenticated');
 
   // Sync bookmark state when tool or user changes
   useEffect(() => {

@@ -4,6 +4,7 @@ import ToolList from '../components/Profile/ToolList';
 import { useMyTools } from '../context/MyToolsProvider';
 import ProfileCard from '../components/Profile/ProfileCard';
 import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
+import { useAppSelector } from '../store/hooks';
 
 const profileStats = [
   {
@@ -32,21 +33,30 @@ const DashboardPage = () => {
   const isLoading = false; // Set to true when fetching data
   const navigate = useNavigate();
   const { state: myToolsState } = useMyTools();
+  const { bookmarkedTools } = useAppSelector((state) => state.user);
 
   const userTools = myToolsState.context.tools;
   const toolsCount = userTools.length;
+  const bookmarksCount = bookmarkedTools.length;
 
-  // Update tools count dynamically
-  const updatedProfileStats = profileStats.map(stat => 
-    stat.icon === "tools" ? { ...stat, value: toolsCount } : stat
-  );
+  // Update tools count and bookmarks count dynamically
+  const updatedProfileStats = profileStats.map(stat => {
+    if (stat.icon === "tools") {
+      return { ...stat, value: toolsCount };
+    }
+    if (stat.icon === "bookmarks") {
+      return { ...stat, value: bookmarksCount };
+    }
+    return stat;
+  });
 
-  // Get first 5 tools for bookmarks and next 5 for recently viewed
-  const myBookmarks = tools.slice(0, 5).map(tool => ({
+  // Get first 5 bookmarked tools for display
+  const myBookmarks = bookmarkedTools.slice(0, 5).map(tool => ({
     name: tool.name,
     logo: tool.logo,
   }));
 
+  // Get next 5 tools for recently viewed (using dummy data for now)
   const recentlyViewed = tools.slice(5, 10).map(tool => ({
     name: tool.name,
     logo: tool.logo,
@@ -71,7 +81,13 @@ const DashboardPage = () => {
                                 label={stat.label} 
                                 value={stat.value} 
                                 iconName={stat.icon as "tools" | "votes" | "bookmarks" | "comments"}
-                                onClick={stat.icon === "tools" ? () => navigate('/my-tools') : undefined}
+                                onClick={
+                                  stat.icon === "tools" 
+                                    ? () => navigate('/my-tools') 
+                                    : stat.icon === "bookmarks"
+                                    ? () => navigate('/my-bookmarks')
+                                    : undefined
+                                }
                             />
                         ))
                     ) : (

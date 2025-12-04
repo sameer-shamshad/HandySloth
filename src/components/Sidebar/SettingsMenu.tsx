@@ -9,9 +9,7 @@ interface SettingsMenuProps {
 
 const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMode, onClose }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-  const { state: authState, send: authSend } = useAuth();
-
-  const isAuthenticated = authState.matches('authenticated');
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,7 +69,7 @@ const SettingsMenu: React.FC<SettingsMenuProps> = ({ isDarkMode, onToggleDarkMod
         disabled={!isAuthenticated}
         className="w-full! flex items-center justify-start! bg-transparent! mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={() => {
-          authSend({ type: 'LOGOUT' });
+          logout();
           onClose();
         }}
       >

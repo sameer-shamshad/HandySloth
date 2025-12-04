@@ -93,3 +93,19 @@ export const refreshAccessToken = async (refreshToken: string): Promise<RefreshA
     throw error;
   }
 };
+
+interface LogoutResponse {
+  message: string;
+}
+
+export const logout = async (refreshToken: string): Promise<LogoutResponse> => {
+  try {
+    const response = await axios.post<LogoutResponse>('/api/auth/logout', { refreshToken });
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to logout');
+    }
+    throw error;
+  }
+};

@@ -15,10 +15,11 @@ let refreshPromise: Promise<string> | null = null;
 axios.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         const accessToken = localStorage.getItem('accessToken');
         
-        // Don't attach token to refresh endpoint or auth endpoints (login/register)
+        // Don't attach token to refresh endpoint or auth endpoints (login/register/logout)
         if (config.url?.includes('/refresh-access-token') || 
             config.url?.includes('/login') || 
-            config.url?.includes('/register')) {
+            config.url?.includes('/register') ||
+            config.url?.includes('/logout')) {
             return config;
         }
 
@@ -36,13 +37,14 @@ axios.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
         const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-        
+
         // If it's a 401 and we haven't already retried
         if (error.response?.status === 401 && !originalRequest._retry) {
             // Skip refresh for auth endpoints
             if (originalRequest.url?.includes('/refresh-access-token') ||
                 originalRequest.url?.includes('/login') ||
                 originalRequest.url?.includes('/register') ||
+                originalRequest.url?.includes('/logout') ||
                 originalRequest.url?.includes('/check-session')) {
                 return Promise.reject(error);
             }

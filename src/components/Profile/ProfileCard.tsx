@@ -1,6 +1,9 @@
-import React from 'react'
+import { useAuth } from '../../hooks/useAuth'
+import { formatAccountCreationDate } from '../../utils/time'
 
 const ProfileCard = () => {
+    const { user } = useAuth()
+
     return (
         <div className='w-max flex xl:flex-col items-center xl:items-center gap-4 xl:gap-1'>
             <img 
@@ -9,8 +12,12 @@ const ProfileCard = () => {
                 className='w-10 h-10 rounded-full object-cover'
             />
             <div className='flex flex-col xl:items-center'>
-                <h4 className='text-primary-color text-sm font-bold dark:text-main-color'>John Doe</h4>
-                <p className='text-secondary-color text-xs w-max'>Joined Nov 2024</p>
+                <h4 className='text-primary-color text-center text-sm font-bold dark:text-main-color'>
+                    {user?.username || 'User'}
+                </h4>
+                <p className='text-secondary-color text-xs w-max'>
+                    {user?.createdAt ? formatAccountCreationDate(user.createdAt) : 'Joined recently'}
+                </p>
             </div>
         </div>
     )

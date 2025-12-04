@@ -1,29 +1,29 @@
-import { useMachine } from '@xstate/react';
 import { useEffect } from 'react';
+import { useMachine } from '@xstate/react';
+import { useAppDispatch } from '../store/hooks';
 import registerMachine from '../machines/RegisterMachine';
-import { useAuth } from '../context/AuthProvider';
+import { setAuthenticated } from '../store/features/AuthReducer';
 
 interface RegisterProps {
   onSwitchToLogin?: () => void;
 }
 
 const Register = ({ onSwitchToLogin }: RegisterProps) => {
+  const dispatch = useAppDispatch();
   const [state, send] = useMachine(registerMachine);
-  const { send: sendAuth } = useAuth();
   const { username, email, password, confirmPassword, error } = state.context;
 
-  // Notify AuthMachine when register succeeds
   useEffect(() => {
     if (state.matches('success') && state.context.authResponse) {
       const { accessToken, refreshToken, user } = state.context.authResponse;
-      sendAuth({
-        type: 'SET_AUTHENTICATED',
-        user,
+      // Update Redux auth state - include refreshToken in user object
+      dispatch(setAuthenticated({
+        user: refreshToken ? { ...user, refreshToken } : user,
         accessToken,
         refreshToken,
-      });
+      }));
     }
-  }, [state, sendAuth]);
+  }, [state, dispatch]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

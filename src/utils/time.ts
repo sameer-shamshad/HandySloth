@@ -22,3 +22,15 @@ export const formatRelativeTime = (timestamp: number, now: number = Date.now()) 
   const days = Math.floor(diff / DAY_MS);
   return `${days}d ago`;
 };
+
+/**
+ * Formats a date string to "Joined [Month] [Year]" format
+ * @param dateString - ISO date string (e.g., "2024-11-15T10:00:00Z")
+ * @returns Formatted string like "Joined Nov 2024"
+ */
+export const formatAccountCreationDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const month = date.toLocaleDateString('en-US', { month: 'short' });
+  const year = date.getFullYear();
+  return `Joined ${month} ${year}`;
+};

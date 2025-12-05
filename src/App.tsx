@@ -21,7 +21,7 @@ const App = () => {
     <>
       <Routes>
         <Route path='/' element={<DashboardLayout />}>
-          <Route index path='/' element={<HomePage />} />
+          <Route index element={<HomePage />} />
           <Route path='/dashboard' element={<DashboardPage />} />
           <Route path='/trending' element={<TrendingPage />} />
           <Route path='/popular' element={<PopularPage />} />

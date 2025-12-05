@@ -1,10 +1,12 @@
 import authReducer from './features/AuthReducer';
-import userReducer, { loadPersistedUserState } from './features/userReducer';
 import { configureStore } from '@reduxjs/toolkit';
 import { authMiddleware } from './middleware/authMiddleware';
+import userReducer, { loadPersistedUserState } from './features/userReducer';
 
-// Load persisted user state from localStorage (IDs only)
-const persistedUserState = loadPersistedUserState();
+// Only load persisted user state if tokens exist (user might be authenticated)
+const accessToken = localStorage.getItem('accessToken');
+const refreshToken = localStorage.getItem('refreshToken');
+const persistedUserState = (accessToken || refreshToken) ? loadPersistedUserState() : { tools: [], bookmarkedTools: [] };
 
 export const store = configureStore({
   reducer: {

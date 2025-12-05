@@ -14,7 +14,7 @@ export const authMiddleware: Middleware = (store) => (next) => (action) => {
     store.dispatch(fetchUserToolsThunk() as any);
     store.dispatch(fetchBookmarkedToolsThunk() as any);
   }
-  
+ 
   // Also trigger fetch on session check success (page reload scenario)
   if (checkSessionThunk.fulfilled.match(action)) {
     // After successful session check, fetch user tools and bookmarks

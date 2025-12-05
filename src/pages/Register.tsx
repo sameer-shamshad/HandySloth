@@ -18,7 +18,7 @@ const Register = ({ onSwitchToLogin }: RegisterProps) => {
       const { accessToken, refreshToken, user } = state.context.authResponse;
       // Update Redux auth state - include refreshToken in user object
       dispatch(setAuthenticated({
-        user: refreshToken ? { ...user, refreshToken } : user,
+        user,
         accessToken,
         refreshToken,
       }));

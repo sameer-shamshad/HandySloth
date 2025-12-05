@@ -1,4 +1,4 @@
-import { logoutThunk } from "./AuthReducer";
+import { logoutThunk, checkSessionThunk } from "./AuthReducer";
 import type { RootState, AppDispatch } from "../store";
 import { createReducer, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import { fetchUserTools, fetchBookmarkedTools } from "../../services/tools.service";
@@ -124,6 +124,9 @@ export const addUserTool = createAction<string>('user/addTool'); // toolId
 export const addBookmarkedTool = createAction<string>('user/addBookmarkedTool'); // toolId
 export const removeBookmarkedTool = createAction<string>('user/removeBookmarkedTool'); // toolId
 
+// Action to clear all user data (when user is not authenticated)
+export const clearUserData = createAction('user/clearUserData');
+
 const userReducer = createReducer(initialState, (builder) => {
   builder
     .addCase(fetchUserToolsThunk.pending, (state) => {
@@ -202,6 +205,28 @@ const userReducer = createReducer(initialState, (builder) => {
       state.bookmarksError = null;
       
       clearLocalStorage(); // Clear localStorage on logout failure too
+    })
+    // Clear user data when session check fails (user not authenticated)
+    .addCase(checkSessionThunk.rejected, (state) => {
+      state.tools = [];
+      state.bookmarkedTools = [];
+      state.isLoadingTools = false;
+      state.isLoadingBookmarks = false;
+      state.error = null;
+      state.bookmarksError = null;
+      // Clear localStorage when session check fails
+      clearLocalStorage();
+    })
+    // Clear all user data (generic action)
+    .addCase(clearUserData, (state) => {
+      state.tools = [];
+      state.bookmarkedTools = [];
+      state.isLoadingTools = false;
+      state.isLoadingBookmarks = false;
+      state.error = null;
+      state.bookmarksError = null;
+      // Clear localStorage
+      clearLocalStorage();
     });
 });
 

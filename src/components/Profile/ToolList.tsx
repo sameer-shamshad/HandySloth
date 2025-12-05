@@ -15,7 +15,7 @@ const ToolList = ({ tools, label }: ToolListProps) => {
             {
                 tools.length > 0 ? tools.map((tool, index) => (
                     <div 
-                        key={tool.name}
+                        key={`${tool.name}-${index}`}
                         className='flex items-center gap-2 border-b border-border-color last:border-b-0 pb-4'
                     >
                         <span className='text-secondary-color text-xs ml-4'>{index + 1}</span>

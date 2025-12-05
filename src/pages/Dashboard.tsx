@@ -5,7 +5,7 @@ import { useTools } from '../context/ToolsProvider';
 import ProfileCard from '../components/Profile/ProfileCard';
 import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { fetchUserToolsThunk, fetchBookmarkedToolsThunk } from '../store/features/userReducer';
+import { clearUserData } from '../store/features/userReducer';
 import { fetchToolsByIds } from '../services/tools.service';
 import { useAuth } from '../hooks/useAuth';
 
@@ -37,45 +37,46 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { state: toolsState } = useTools();
-  const { isAuthenticated } = useAuth();
-  const { tools: userToolIds, bookmarkedTools: bookmarkedToolIds, isLoadingBookmarks } = useAppSelector((state) => state.user);
+  const { isAuthenticated, accessToken } = useAuth();
+  const { tools: userToolIds, bookmarkedTools: bookmarkedToolIds } = useAppSelector((state) => state.user);
   const [bookmarkedToolsForDisplay, setBookmarkedToolsForDisplay] = useState<Array<{ name: string; logo: string }>>([]);
 
-  // Fetch user tools and bookmarked tools if user is authenticated but IDs haven't been fetched
-  useEffect(() => {
-    if (isAuthenticated) {
-      if (userToolIds.length === 0) {
-        dispatch(fetchUserToolsThunk());
-      }
-      if (bookmarkedToolIds.length === 0 && !isLoadingBookmarks) {
-        dispatch(fetchBookmarkedToolsThunk());
-      }
-    }
-  }, [isAuthenticated, userToolIds.length, bookmarkedToolIds.length, isLoadingBookmarks, dispatch]);
+  // // Clear user data if user is not authenticated and has no tokens
+  // useEffect(() => {
+  //   const accessToken = localStorage.getItem('accessToken');
+  //   const refreshToken = localStorage.getItem('refreshToken');
+    
+  //   if (!isAuthenticated && !accessToken && !refreshToken) {
+  //     // Clear user data if not authenticated and no tokens exist
+  //     if (userToolIds.length > 0 || bookmarkedToolIds.length > 0) {
+  //       dispatch(clearUserData());
+  //     }
+  //   }
+  // }, [isAuthenticated, userToolIds.length, bookmarkedToolIds.length, dispatch]);
 
-  // Fetch first 5 bookmarked tools for display
-  useEffect(() => {
-    const fetchBookmarksForDisplay = async () => {
-      if (bookmarkedToolIds.length === 0) {
-        setBookmarkedToolsForDisplay([]);
-        return;
-      }
+  // // Fetch first 5 bookmarked tools for display
+  // useEffect(() => {
+  //   const fetchBookmarksForDisplay = async () => {
+  //     if (bookmarkedToolIds.length === 0) {
+  //       setBookmarkedToolsForDisplay([]);
+  //       return;
+  //     }
 
-      try {
-        const firstFiveIds = bookmarkedToolIds.slice(0, 5);
-        const tools = await fetchToolsByIds(firstFiveIds);
-        setBookmarkedToolsForDisplay(tools.map(tool => ({
-          name: tool.name,
-          logo: tool.logo,
-        })));
-      } catch (error) {
-        console.error('Failed to fetch bookmarked tools for display:', error);
-        setBookmarkedToolsForDisplay([]);
-      }
-    };
+  //     try {
+  //       const firstFiveIds = bookmarkedToolIds.slice(0, 5);
+  //       const tools = await fetchToolsByIds(firstFiveIds);
+  //       setBookmarkedToolsForDisplay(tools.map(tool => ({
+  //         name: tool.name,
+  //         logo: tool.logo,
+  //       })));
+  //     } catch (error) {
+  //       console.error('Failed to fetch bookmarked tools for display:', error);
+  //       setBookmarkedToolsForDisplay([]);
+  //     }
+  //   };
 
-    fetchBookmarksForDisplay();
-  }, [bookmarkedToolIds]);
+  //   fetchBookmarksForDisplay();
+  // }, [bookmarkedToolIds]);
 
   const toolsCount = userToolIds.length;
   const bookmarksCount = bookmarkedToolIds.length;

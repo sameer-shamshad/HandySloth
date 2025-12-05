@@ -1,24 +1,12 @@
 import { useEffect, useState } from 'react';
 import ToolsGrid from '../components/Tools/ToolsGrid';
-import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { fetchBookmarkedToolsThunk } from '../store/features/userReducer';
+import { useAppSelector } from '../store/hooks';
 import { fetchToolsByIds } from '../services/tools.service';
 import type { Tool } from '../types';
-import { useAuth } from '../hooks/useAuth';
-
 const MyBookmarksPage = () => {
-    const dispatch = useAppDispatch();
-    const { isAuthenticated } = useAuth();
-    const { bookmarkedTools: bookmarkedToolIds, isLoadingBookmarks } = useAppSelector((state) => state.user);
+    const { bookmarkedTools: bookmarkedToolIds } = useAppSelector((state) => state.user);
     const [tools, setTools] = useState<Tool[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    // Fetch bookmarked tool IDs if user is authenticated but IDs haven't been fetched
-    useEffect(() => {
-        if (isAuthenticated && bookmarkedToolIds.length === 0 && !isLoadingBookmarks) {
-            dispatch(fetchBookmarkedToolsThunk());
-        }
-    }, [isAuthenticated, bookmarkedToolIds.length, isLoadingBookmarks, dispatch]);
 
     // Fetch full tools by IDs when IDs are available
     useEffect(() => {

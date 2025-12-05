@@ -14,65 +14,40 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
   const userId = user?._id;
   const { bookmarkedTools } = useAppSelector((state) => state.user);
 
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
-    if (!userId) return false;
-    // Check if tool ID exists in Redux bookmarkedTools array (array of IDs)
-    return bookmarkedTools.includes(tool._id);
-  });
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  // Sync bookmark state when tool, user, or Redux bookmarkedTools changes
+  
   useEffect(() => {
-    if (!userId) {
-      setIsBookmarked(false);
-      return;
+    if (isAuthenticated && bookmarkedTools.length > 0) {
+      console.log("Looged now")
+      setIsBookmarked(bookmarkedTools.includes(tool._id));
     }
-    // Check if tool ID exists in Redux bookmarkedTools array (array of IDs)
-    setIsBookmarked(bookmarkedTools.includes(tool._id));
-  }, [tool._id, userId, bookmarkedTools]);
+  }, [userId, isAuthenticated, bookmarkedTools]);
 
   const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Only allow bookmarking if user is authenticated
-    if (!isAuthenticated || !userId) {
-      return;
-    }
-
-    // Prevent action if already loading
-    if (isLoading) {
-      return;
-    }
+    if (!isAuthenticated || !userId) return;
+    if (isLoading) return;
 
     setIsLoading(true);
     const previousBookmarkState = isBookmarked;
-
-    // Optimistically update UI
     setIsBookmarked(!isBookmarked);
 
     try {
-      const updatedTool = previousBookmarkState
-        ? await removeBookmark(tool._id)
-        : await bookmarkTool(tool._id);
+      await (previousBookmarkState
+        ? removeBookmark(tool._id)
+        : bookmarkTool(tool._id));
      
-      // Update Redux state for real-time updates
       if (previousBookmarkState) {
-        // Removing bookmark - dispatch remove action with tool ID
         dispatch(removeBookmarkedTool(tool._id));
       } else {
-        // Adding bookmark - dispatch add action with tool ID
         dispatch(addBookmarkedTool(tool._id));
       }
       
-      // Sync with API response
-      if (updatedTool && Array.isArray(updatedTool.bookmarks)) {
-        setIsBookmarked(updatedTool.bookmarks.includes(userId));
-      }
     } catch (error) {
-      // Revert optimistic update on error
       setIsBookmarked(previousBookmarkState);
       console.error('Failed to update bookmark:', error);
-      // Optionally show a toast/notification here
     } finally {
       setIsLoading(false);
     }

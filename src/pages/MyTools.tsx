@@ -1,24 +1,12 @@
 import { useEffect, useState } from 'react';
 import ToolsGrid from '../components/Tools/ToolsGrid';
-import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { fetchUserToolsThunk } from '../store/features/userReducer';
+import { useAppSelector } from '../store/hooks';
 import { fetchToolsByIds } from '../services/tools.service';
 import type { Tool } from '../types';
-import { useAuth } from '../hooks/useAuth';
-
 const MyToolsPage = () => {
-    const dispatch = useAppDispatch();
-    const { isAuthenticated } = useAuth();
-    const { tools: toolIds, isLoadingTools } = useAppSelector((state) => state.user);
+    const { tools: toolIds } = useAppSelector((state) => state.user);
     const [tools, setTools] = useState<Tool[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    // Fetch tool IDs if not already loaded
-    useEffect(() => {
-        if (isAuthenticated && toolIds.length === 0 && !isLoadingTools) {
-            dispatch(fetchUserToolsThunk());
-        }
-    }, [isAuthenticated, toolIds.length, isLoadingTools, dispatch]);
 
     // Fetch full tools by IDs when IDs are available
     useEffect(() => {

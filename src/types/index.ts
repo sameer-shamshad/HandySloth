@@ -69,7 +69,6 @@ export type Contact = {
   reason: string;
   terms: boolean;
 }
-
 export interface User {
   _id: string;
   username: string;

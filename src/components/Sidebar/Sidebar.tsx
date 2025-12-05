@@ -119,7 +119,7 @@ const Sidebar = () => {
                     `w-full flex items-center gap-3 px-4 py-4 md:py-2 rounded-2xl 2xl:w-max transition-colors ${
                       isActive
                         ? 'bg-[#8fd7d7] dark:bg-[#080a13] text-black-color dark:text-primary-color'
-                        : 'text-gray-500! hover:bg-shadow-color'
+                        : 'text-gray-500! hover:bg-[#8fd7d7] dark:hover:bg-[#080a13]'
                     }`
                   }
                 >

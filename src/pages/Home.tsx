@@ -8,8 +8,8 @@ const HomePage = () => {
         <input
           type="search"
           placeholder="Search tools"
-          className="flex-1 rounded-full border border-border-color text-primary-color outline-0
-            bg-primary-bg hidden xl:block px-8 py-3 text-lg outline-none focus:ring focus:ring-main-color/40"
+          className="flex-1 rounded-full text-primary-color outline-0
+            bg-primary-bg hidden xl:block px-8 py-3 text-lg outline-none shadow-[0_0_20px_0_rgba(0,0,0,0.1)]"
         />
       </div>
 

@@ -13,7 +13,7 @@ type AuthState = {
 
 const getInitialContext = (): AuthState => {
   const accessToken = localStorage.getItem('accessToken');
-  
+ 
   return {
     user: null,
     error: null,
@@ -34,7 +34,7 @@ export const checkSessionThunk = createAsyncThunk<
   'auth/checkSession',
   async (_, { getState, rejectWithValue }) => {
     const { auth } = getState();
-    const { accessToken, user } = auth;
+    const { accessToken, user } = auth as { accessToken: string; user: User };
     const refreshToken = user?.refreshToken || localStorage.getItem('refreshToken');
 
     if (!accessToken) {
@@ -43,13 +43,10 @@ export const checkSessionThunk = createAsyncThunk<
 
     try {
       const response = await checkSessionApi(accessToken);
-      // Use refreshToken from user object, response root, existing state, or localStorage
-      const refreshTokenValue = response.user.refreshToken || response.refreshToken || user?.refreshToken || localStorage.getItem('refreshToken');
-      const userWithRefreshToken = refreshTokenValue ? { ...response.user, refreshToken: refreshTokenValue } : response.user;
       return {
-        user: userWithRefreshToken,
-        accessToken: response.accessToken,
-        refreshToken: refreshTokenValue || undefined,
+        user: response.user,
+        accessToken: accessToken,
+        refreshToken: refreshToken || undefined,
       };
     } catch (error: unknown) {
       // If 401, try to refresh token
@@ -59,27 +56,15 @@ export const checkSessionThunk = createAsyncThunk<
           try {
             const refreshResponse = await refreshAccessTokenApi(refreshToken);
             localStorage.setItem('accessToken', refreshResponse.accessToken);
-            // Preserve refreshToken in localStorage (it stays the same unless backend provides a new one)
-            // This ensures refreshToken is always accessible even if accessToken expires on reload
+            
             if (!localStorage.getItem('refreshToken')) {
               localStorage.setItem('refreshToken', refreshToken);
             }
             
-            // Retry checkSession with new token
-            const retryResponse = await checkSessionApi(refreshResponse.accessToken);
-            // Use refreshToken from user object (from backend), response root, or existing refreshToken
-            const refreshTokenValue = retryResponse.user.refreshToken || retryResponse.refreshToken || refreshToken;
-            
-            // Store refreshToken in localStorage if we got a new one
-            if (refreshTokenValue) {
-              localStorage.setItem('refreshToken', refreshTokenValue);
-            }
-            
-            const userWithRefreshToken = refreshTokenValue ? { ...retryResponse.user, refreshToken: refreshTokenValue } : retryResponse.user;
             return {
-              user: userWithRefreshToken,
+              user,
               accessToken: refreshResponse.accessToken,
-              refreshToken: refreshTokenValue || undefined,
+              refreshToken: refreshToken,
             };
           } catch (refreshError) {
             return rejectWithValue('Failed to refresh token');
@@ -139,14 +124,13 @@ const authReducer = createReducer(initialState, (builder) => {
       
       // Prioritize refreshToken from user object (from backend), then from payload
       const refreshTokenValue = user.refreshToken || refreshToken;
-      const userWithRefreshToken = refreshTokenValue ? { ...user, refreshToken: refreshTokenValue } : user;
       
       // Always store refreshToken in localStorage if available (so it's accessible even if accessToken expires)
       if (refreshTokenValue) {
         localStorage.setItem('refreshToken', refreshTokenValue);
       }
 
-      state.user = userWithRefreshToken;
+      state.user = user;
       state.isAuthenticated = true;
       state.isLoading = false;
       state.error = null;
@@ -168,18 +152,11 @@ const authReducer = createReducer(initialState, (builder) => {
       
       localStorage.setItem('accessToken', accessToken);
       
-      // Prioritize refreshToken from user object, then from payload
-      const refreshTokenValue = user.refreshToken || refreshToken;
-      
-      // Always store refreshToken in localStorage if available (so it's accessible even if accessToken expires)
-      if (refreshTokenValue) {
-        localStorage.setItem('refreshToken', refreshTokenValue);
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
       }
 
-      // Store refreshToken in user object
-      const userWithRefreshToken = refreshTokenValue ? { ...user, refreshToken: refreshTokenValue } : user;
-
-      state.user = userWithRefreshToken;
+      state.user = { ...user, refreshToken };
       state.accessToken = accessToken;
       state.isAuthenticated = true;
       state.isLoading = false;

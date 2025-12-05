@@ -69,7 +69,7 @@ export const createTool = async (tool: CreateToolInput): Promise<Tool> => {
   try {
     const requestData: CreateToolRequest = {
       ...tool,
-      category: tool.category || [],
+      category: tool?.category || [],
     };
 
     const response = await axios.post<CreateToolResponse>('/api/tool', requestData);

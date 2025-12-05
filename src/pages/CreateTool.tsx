@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useMachine } from '@xstate/react';
+import { useNavigate } from 'react-router-dom';
 import { useTools } from '../context/ToolsProvider';
 import { useAppDispatch } from '../store/hooks';
 import { addUserTool } from '../store/features/userReducer';
@@ -45,9 +46,10 @@ const SOCIAL_FIELDS: ReadonlyArray<{ label: string; name: 'telegram' | 'x' | 'we
 const inputClassNames = 'mt-2 w-full rounded-md border border-border-color dark:bg-secondary-bg px-3 py-2 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-primary-color';
 
 const CreateToolPage = () => {
-  const [state, send] = useMachine(createToolMachine);
-  const { send: sendTools } = useTools();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { send: sendTools } = useTools();
+  const [state, send] = useMachine(createToolMachine);
 
   const {
     name,
@@ -65,17 +67,23 @@ const CreateToolPage = () => {
   useEffect(() => {
     if (state.matches('success') && state.context.toolResponse) {
       const newTool = state.context.toolResponse;
-      
+     
       // Add to ToolMachine (for recent/trending tools)
       sendTools({
-        type: 'ADD_TOOL',
         tool: newTool,
+        type: 'ADD_TOOL',
+        toolListType: 'recent',
       });
       
       // Add tool ID to Redux userReducer (for user's tools in Redux state)
       dispatch(addUserTool(newTool._id));
+      
+      // Navigate to dashboard after a brief delay to show success state
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     }
-  }, [state, sendTools, dispatch]);
+  }, [state, sendTools, dispatch, navigate]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;

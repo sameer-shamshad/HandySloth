@@ -14,6 +14,7 @@ import {
   CreateToolPage, 
   MyToolsPage,
   MyBookmarksPage,
+  CategoryPage,
 } from './pages';
 
 const App = () => {
@@ -26,6 +27,7 @@ const App = () => {
           <Route path='/trending' element={<TrendingPage />} />
           <Route path='/popular' element={<PopularPage />} />
           <Route path='/category' element={<CategoriesPage />} />
+          <Route path='/category/:category' element={<CategoryPage />} />
           <Route path='/submit' element={<SubmitToolPage />} />
           <Route path='/contact' element={<ContactPage />} />
           <Route path='/tool/:id' element={<ToolViewPage />} />

@@ -121,9 +121,9 @@ const authReducer = createReducer(initialState, (builder) => {
         localStorage.setItem('accessToken', accessToken);
         state.accessToken = accessToken;
       }
-      
+
       // Prioritize refreshToken from user object (from backend), then from payload
-      const refreshTokenValue = user.refreshToken || refreshToken;
+      const refreshTokenValue = user?.refreshToken || refreshToken;
       
       // Always store refreshToken in localStorage if available (so it's accessible even if accessToken expires)
       if (refreshTokenValue) {

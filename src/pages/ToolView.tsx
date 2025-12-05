@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Tool, ToolCategory } from "../types";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
-import ToolImage from "../assets/tool-image.png";
 import { useTools } from "../context/ToolsProvider";
 import ToolNotFound from "../components/Tools/ToolNotFound";
 import ToolCommunityRatings from "../components/Tools/ToolCommunityRatings";
@@ -20,6 +19,7 @@ const ToolViewPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true); // Start with loading - will fetch on mount
   const [fetchError, setFetchError] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  const [popularAlternative, setPopularAlternative] = useState<{ _id: string; name: string; totalSaved: number; totalAlternatives: number } | null>(null);
 
   // Fetch tool by ID from API and update/add to machine
   useEffect(() => {
@@ -36,9 +36,21 @@ const ToolViewPage = () => {
       setIsLoading(true);
       
       try {
-        const fetchedTool = await fetchToolById(id);
+        const response = await fetchToolById(id);
         
         if (isCancelled) return;
+        
+        const fetchedTool = response.tool;
+        
+        // Set popular alternative from the response
+        if (response.alternative) {
+          setPopularAlternative({
+            _id: response.alternative.tool._id,
+            name: response.alternative.tool.name,
+            totalSaved: response.alternative.totalSaved,
+            totalAlternatives: response.alternative.totalAlternatives,
+          });
+        }
         
         // Check if tool exists in any of the machine arrays (recentTools, trendingTools, popularTools)
         const { recentTools, trendingTools, popularTools } = state.context;
@@ -80,7 +92,7 @@ const ToolViewPage = () => {
   if (fetchError && !isLoading && !tool) {
     return <ToolNotFound />;
   }
-  
+
   // Show loading while fetching or if tool not found yet (will be found after fetch completes)
   if (isLoading || !tool) {
     return <div>Loading...</div>;
@@ -89,12 +101,15 @@ const ToolViewPage = () => {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-5 px-4">
-        <div className="flex items-center gap-2 bg-black-color dark:bg-primary-bg rounded-md px-2">
+        <Link 
+          to={`/category/${tool?.primaryCategory}`}
+          className="flex items-center gap-2 bg-black-color dark:bg-primary-bg rounded-md px-2 hover:opacity-80 transition-opacity"
+        >
           <span className="material-symbols-outlined text-gray-400! text-lg!">
             signal_cellular_alt
           </span>
           <span className="text-white text-sm">{tool?.primaryCategory}</span>
-        </div>
+        </Link>
 
         <div className="flex items-center ">
           <span className="material-symbols-outlined text-gray-500! text-lg!">
@@ -119,9 +134,12 @@ const ToolViewPage = () => {
             <h3 className="text-lg font-bold text-primary-color text-wrap">
               {tool?.name || "Open AI"}
             </h3>
-            <p className="text-sm text-secondary-color -mt-2">
+            <Link 
+              to={`/category/${tool?.primaryCategory}`}
+              className="text-sm text-secondary-color -mt-2 hover:text-primary-color transition-colors"
+            >
               {tool?.primaryCategory}
-            </p>
+            </Link>
           </div>
 
           <div
@@ -244,25 +262,35 @@ const ToolViewPage = () => {
         <p className="text-xs text-secondary-color">{tool?.shortDescription}</p>
       </main>
 
-      <main className="flex flex-col xl:flex-row gap-6 bg-primary-bg xl:bg-transparent px-3 xl:-mx-6 py-8 rounded-3xl">
-        <img
-          alt="Tool Usage Image"
-          src={ToolImage}
-          className="w-full h-auto rounded-xl"
-        />
+      <main className="h-min flex flex-col xl:flex-row gap-6 bg-primary-bg xl:bg-transparent px-3 xl:-mx-6 py-8 rounded-3xl">
+        <div className="w-full flex flex-col gap-4 overflow-y-auto">
+          {
+            Array.isArray(tool?.toolImages) && tool.toolImages.length > 0 && tool.toolImages.filter((v, i) => i === 0).map((image: string, index: number) => (
+              <img
+                key={index}
+                alt="Tool Usage Image"
+                src={image}
+                className="w-full h-auto rounded-xl"
+              />
+            ))
+          }
+        </div>
 
-        <div className="gap-5 flex flex-col py-6 px-8 xl:bg-primary-bg xl:rounded-3xl xl:px-6 xl:py-12 2xl:px-8">
+        <div className="h-min gap-5 flex flex-col py-6 px-8 xl:w-xl xl:bg-primary-bg xl:rounded-3xl xl:px-6 xl:py-12 2xl:px-8">
             <div className="flex flex-col items-center gap-1 bg-group-bg rounded-xl overflow-hidden pt-3">
                 <h4 className="text-sm text-secondary-color font-extralight">
                     Primary Task
                 </h4>
 
-                <div className="flex items-center gap-2 bg-black-color dark:bg-primary-bg rounded-md px-4 py-1">
+                <Link 
+                  to={`/category/${tool?.primaryCategory}`}
+                  className="flex items-center gap-2 bg-black-color dark:bg-primary-bg rounded-md px-4 py-1 hover:opacity-80 transition-opacity"
+                >
                     <span className="material-symbols-outlined text-gray-400! text-lg!">
                         signal_cellular_alt
                     </span>
                     <span className="text-white text-sm">{tool?.primaryCategory}</span>
-                </div>
+                </Link>
 
                 <span className="w-full py-3 text-xs text-secondary-color text-center font-extralight mt-4 bg-gray-500/40 dark:bg-secondary-bg/30">
                     #1 Most Recent
@@ -288,9 +316,18 @@ const ToolViewPage = () => {
                 Most Popular Alternative:
             </h5>
 
-            <h3 className="text-primary-color font-bold underline">
-                Data Squirrel (914 saves)
-            </h3>
+            {popularAlternative ? (
+              <Link 
+                to={`/tool/${popularAlternative._id}`}
+                className="text-primary-color font-bold underline! underline-offset-4 hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                {popularAlternative.name} ({popularAlternative.totalSaved} saves)
+              </Link>
+            ) : (
+              <h3 className="text-primary-color font-bold underline">
+                Loading...
+              </h3>
+            )}
 
             <div className="flex flex-col gap-4 [&>button]:flex [&>button]:items-center [&>button]:gap-2 [&>button]:bg-main-color! 
                 [&>button]:dark:bg-secondary-bg/30! [&>button]:text-primary-color! [&>button]:dark:text-secondary-color! 
@@ -298,7 +335,13 @@ const ToolViewPage = () => {
             >
                 <button type="button" >
                     <span className="material-symbols-outlined">lightbulb_2</span>
-                    <h3>View all 101 alternatives</h3>
+                    <h3>
+                      {`View${
+                        popularAlternative?.totalAlternatives && popularAlternative.totalAlternatives > 1
+                          ? ' all'
+                          : ''
+                      } ${popularAlternative?.totalAlternatives ?? 0} alternatives`}
+                    </h3>
                 </button>
                 <button type="button" >
                     <span className="material-symbols-outlined">toggle_on</span>
@@ -306,7 +349,6 @@ const ToolViewPage = () => {
                 </button>
 
             </div>
-
         </div>
       </main>
 

@@ -8,7 +8,7 @@ interface CreateToolRequest {
   shortDescription?: string;
   fullDetail?: string;
   toolImages?: string[];
-  category: string[]; // Server expects array
+  category: string[];
   primaryCategory: string; // Required primary category (single value)
   tags: string[];
   links: {
@@ -134,10 +134,18 @@ export const fetchToolsByIds = async (toolIds: string[]): Promise<Tool[]> => {
 
 interface FetchToolByIdResponse {
   tool: Tool;
+  alternative: {
+    tool: {
+      _id: string;
+      name: string;
+    };
+    totalSaved: number;
+    totalAlternatives: number;
+  }
   message: string;
 }
 
-export const fetchToolById = async (toolId: string): Promise<Tool> => {
+export const fetchToolById = async (toolId: string): Promise<FetchToolByIdResponse> => {
   try {
     const response = await axios.get<FetchToolByIdResponse>(`/api/tool/${toolId}`);
     
@@ -145,7 +153,8 @@ export const fetchToolById = async (toolId: string): Promise<Tool> => {
       throw new Error(response.data.message || 'Failed to fetch tool');
     }
 
-    return response.data.tool;
+    console.log('Fetch tool by ID response', response.data);
+    return response.data;
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch tool');
@@ -354,6 +363,56 @@ export const fetchBookmarkedTools = async (): Promise<UserBookmarkedTool[]> => {
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchToolsByCategoryResponse {
+  tools: Tool[];
+  message?: string;
+}
+
+export const fetchToolsByCategory = async (primaryCategory: string): Promise<Tool[]> => {
+  try {
+    const response = await axios.get<FetchToolsByCategoryResponse>(`/api/tool/category/${primaryCategory}`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch tools by category');
+    }
+
+    return response.data.tools || [];
+  } catch (error: unknown) {
+    console.log('Error fetching tools by category', error);
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch tools by category');
+    }
+    throw error;
+  }
+};
+
+interface PopularAlternativeResponse {
+  tool: {
+    _id: string;
+    name: string;
+  };
+  totalSaved: number;
+  totalAlternatives: number;
+  message: string;
+}
+
+export const fetchPopularAlternative = async (primaryCategory: string): Promise<PopularAlternativeResponse> => {
+  try {
+    const response = await axios.get<PopularAlternativeResponse>(`/api/tool/popular-alternative/${primaryCategory}`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch popular alternative');
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch popular alternative');
     }
     throw error;
   }

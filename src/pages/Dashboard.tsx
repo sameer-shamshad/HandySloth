@@ -35,8 +35,8 @@ const DashboardPage = () => {
   const { toolIds: userToolIds, bookmarkedToolIds, upvotedToolIds, bookmarkedToolsDisplay } = useAppSelector((state) => state.user);
 
   const toolsCount = userToolIds.length;
-  const bookmarksCount = bookmarkedToolIds.length;
   const upvotesCount = upvotedToolIds.length;
+  const bookmarksCount = bookmarkedToolIds.length;
 
   // Transform bookmarkedToolsDisplay to format expected by ToolList
   const bookmarkedToolsForDisplay = bookmarkedToolsDisplay.map(tool => ({

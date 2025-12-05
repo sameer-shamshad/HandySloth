@@ -10,3 +10,4 @@ export { default as SubmitToolPage } from './SubmitTool';
 export { default as NotFoundPage } from './NotFoundPage';
 export { default as CategoriesPage } from './Categories';
 export { default as CreateToolPage } from './CreateTool';
+export { default as CategoryPage } from './Category';

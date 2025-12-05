@@ -6,7 +6,7 @@ import userReducer, { loadPersistedUserState } from './features/userReducer';
 // Only load persisted user state if tokens exist (user might be authenticated)
 const accessToken = localStorage.getItem('accessToken');
 const refreshToken = localStorage.getItem('refreshToken');
-const persistedUserState = (accessToken || refreshToken) ? loadPersistedUserState() : { tools: [], bookmarkedTools: [] };
+const persistedUserState = (accessToken || refreshToken) ? loadPersistedUserState() : { toolIds: [], bookmarkedToolIds: [], upvotedToolIds: [] };
 
 export const store = configureStore({
   reducer: {
@@ -15,12 +15,21 @@ export const store = configureStore({
   },
   preloadedState: {
     user: {
-      tools: persistedUserState.tools || [],
-      bookmarkedTools: persistedUserState.bookmarkedTools || [],
+      toolIds: persistedUserState.toolIds || [],
+      bookmarkedToolIds: persistedUserState.bookmarkedToolIds || [],
+      upvotedToolIds: persistedUserState.upvotedToolIds || [],
+      tools: [],
+      bookmarkedTools: [],
+      bookmarkedToolsDisplay: [],
+      upvotedTools: [],
       isLoadingTools: false,
       isLoadingBookmarks: false,
+      isLoadingBookmarkedToolsDisplay: false,
+      isLoadingUpvotedTools: false,
       error: null,
       bookmarksError: null,
+      bookmarkedToolsDisplayError: null,
+      upvotedToolsError: null,
     },
   },
   middleware: (getDefaultMiddleware) =>

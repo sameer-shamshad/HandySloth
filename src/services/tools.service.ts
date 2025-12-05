@@ -1,35 +1,7 @@
 import axios from '../lib/axios';
 import { AxiosError } from 'axios';
-import { v4 as uuidv4 } from 'uuid';
-import type { NewTool, Tool, User } from '../types';
-import { tools as seedTools } from '../dummy-data/tools';
+import type { Tool, ToolCategory, User, UserBookmarkedTool } from '../types';
 
-export const fetchToolsMock = (): Promise<Tool[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const clonedTools = (seedTools as Tool[]).map((tool) => ({ ...tool }));
-      resolve(clonedTools);
-    }, 3000);
-  });
-}
-
-export const createToolMock = (tool: NewTool): Promise<Tool> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const now = new Date().toISOString();
-      const clonedTool = {
-        _id: uuidv4(),
-        ...tool,
-        views: 0,
-        bookmarks: [],
-        createdAt: now,
-        updatedAt: now,
-        logo: '',
-      }
-      resolve(clonedTool as Tool);
-    }, 3000);
-  });
-}
 interface CreateToolRequest {
   name: string;
   logo?: string;
@@ -37,6 +9,7 @@ interface CreateToolRequest {
   fullDetail?: string;
   toolImages?: string[];
   category: string[]; // Server expects array
+  primaryCategory: string; // Required primary category (single value)
   tags: string[];
   links: {
     telegram: string;
@@ -53,7 +26,8 @@ interface CreateToolResponse {
 interface CreateToolInput {
   name: string;
   logo?: string;
-  category: string[]; // Array format from machine context
+  category: ToolCategory[]; // Array format from machine context
+  primaryCategory: ToolCategory; // Required primary category (single value)
   shortDescription?: string;
   fullDetail?: string;
   toolImages?: string[];
@@ -82,28 +56,6 @@ export const createTool = async (tool: CreateToolInput): Promise<Tool> => {
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to create tool');
-    }
-    throw error;
-  }
-};
-
-interface FetchUserToolsResponse {
-  toolIds: string[];
-  message: string;
-}
-
-export const fetchUserTools = async (): Promise<string[]> => {
-  try {
-    const response = await axios.get<FetchUserToolsResponse>('/api/user/tools');
-    
-    if (response.status !== 200) {
-      throw new Error(response.data.message || 'Failed to fetch user tools');
-    }
-
-    return response.data.toolIds || [];
-  } catch (error: unknown) {
-    if (error instanceof AxiosError) {
-      throw new Error(error.response?.data.message || 'Failed to fetch user tools');
     }
     throw error;
   }
@@ -148,29 +100,6 @@ export const removeBookmark = async (toolId: string): Promise<BookmarkedTool> =>
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to remove bookmark');
-    }
-    throw error;
-  }
-};
-
-interface FetchBookmarkedToolsResponse {
-  toolIds: string[];
-  message: string;
-}
-
-export const fetchBookmarkedTools = async (): Promise<string[]> => {
-  try {
-    const response = await axios.get<FetchBookmarkedToolsResponse>('/api/user/bookmarks');
-    
-    if (response.status !== 200) {
-      throw new Error(response.data.message || 'Failed to fetch bookmarked tools');
-    }
-
-    return response.data.toolIds || [];
-  } catch (error: unknown) {
-    console.log('Error fetching bookmarked tools', error);
-    if (error instanceof AxiosError) {
-      throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
     }
     throw error;
   }
@@ -264,6 +193,167 @@ export const fetchTrendingTools = async (): Promise<Tool[]> => {
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch trending tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchCategoryStatsResponse {
+  stats: import('../types').CategoryStats[];
+  message?: string;
+}
+
+export const fetchCategoryStats = async (): Promise<import('../types').CategoryStats[]> => {
+  try {
+    const response = await axios.get<FetchCategoryStatsResponse>('/api/tool/stats/categories');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch category stats');
+    }
+
+    return response.data.stats || [];
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch category stats');
+    }
+    throw error;
+  }
+};
+
+interface UpvotedTool {
+  message: string;
+  tool: {
+    _id: string;
+    votes: string[];
+  };
+}
+
+interface UpvoteResponse {
+  message: string;
+  tool: {
+    _id: string;
+    votes: string[];
+  };
+}
+
+export const upvoteTool = async (toolId: string): Promise<UpvotedTool> => {
+  try {
+    const response = await axios.post<UpvoteResponse>(`/api/tool/${toolId}/upvote`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to upvote tool');
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to upvote tool');
+    }
+    throw error;
+  }
+};
+
+export const downvoteTool = async (toolId: string): Promise<UpvotedTool> => {
+  try {
+    const response = await axios.delete<UpvoteResponse>(`/api/tool/${toolId}/upvote`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to downvote tool');
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to downvote tool');
+    }
+    throw error;
+  }
+};
+
+interface FetchUserToolsResponse {
+  toolIds: string[];
+  message: string;
+}
+
+export const fetchUserToolIds = async (): Promise<string[]> => {
+  try {
+    const response = await axios.get<FetchUserToolsResponse>('/api/user/tools/ids');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch user tools');
+    }
+
+    return response.data.toolIds || [];
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch user tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchBookmarkedToolsResponse {
+  bookmarkedToolIds: string[];
+  message: string;
+}
+
+export const fetchBookmarkedToolIds = async (): Promise<string[]> => {
+  try {
+    const response = await axios.get<FetchBookmarkedToolsResponse>('/api/user/bookmarks/ids');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch bookmarked tools');
+    }
+
+    return response.data.bookmarkedToolIds || [];
+  } catch (error: unknown) {
+    console.log('Error fetching bookmarked tools', error);
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchUpvotedToolsResponse {
+  votedToolIds: string[];
+  message: string;
+}
+
+export const fetchUpvotedToolIds = async (): Promise<string[]> => {
+  try {
+    const response = await axios.get<FetchUpvotedToolsResponse>('/api/user/votes/ids');
+
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch upvoted tools');
+    }
+
+    return response.data.votedToolIds || [];
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch upvoted tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchBookmarkedToolsDisplayResponse {
+  bookmarkedTools: UserBookmarkedTool[];
+  message: string;
+}
+
+export const fetchBookmarkedTools = async (): Promise<UserBookmarkedTool[]> => {
+  try {
+    const response = await axios.get<FetchBookmarkedToolsDisplayResponse>('/api/user/bookmarks');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch bookmarked tools');
+    }
+
+    return response.data.bookmarkedTools || [];
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
     }
     throw error;
   }

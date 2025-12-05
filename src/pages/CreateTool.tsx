@@ -55,6 +55,7 @@ const CreateToolPage = () => {
     name,
     logo,
     category,
+    primaryCategory,
     shortDescription,
     fullDetail,
     toolImages,
@@ -87,18 +88,22 @@ const CreateToolPage = () => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    const validFields: (keyof NewTool)[] = ['name', 'logo', 'shortDescription', 'fullDetail', 'toolImages', 'category', 'tags', 'links'];
+    const validFields: (keyof NewTool)[] = ['name', 'logo', 'shortDescription', 'fullDetail', 'toolImages', 'category', 'primaryCategory', 'tags', 'links'];
     if (validFields.includes(name as keyof NewTool)) {
       send({ type: "CHANGE_FIELD", field: name as keyof NewTool, value });
     }
   };
 
   const handleToggleCategory = (selectedCategory: ToolCategory) => {
-    // Category is array - toggle: add if not present, remove if present
     const newCategories = category.includes(selectedCategory)
       ? category.filter((c) => c !== selectedCategory)
       : [...category, selectedCategory];
     send({ type: "CHANGE_FIELD", field: "category", value: newCategories });
+  };
+
+  const handleTogglePrimaryCategory = (selectedCategory: ToolCategory) => {
+    const newPrimaryCategory = primaryCategory === selectedCategory ? '' : selectedCategory;
+    send({ type: "CHANGE_FIELD", field: "primaryCategory", value: newPrimaryCategory });
   };
 
   const handleToggleTag = (tag: ToolTag) => {
@@ -171,6 +176,23 @@ const CreateToolPage = () => {
                     />
                     <p className="hint mt-1">Enter the URL of the tool's logo image</p>
                 </div>
+
+            <div className="flex flex-col gap-3">
+                <label>Primary Category *</label>
+                <div className="flex gap-2 flex-wrap">
+                    {
+                        CATEGORY_OPTIONS.map((categoryOption) => (
+                            <SelectablePill
+                                key={categoryOption}
+                                label={categoryOption}
+                                selected={primaryCategory === categoryOption}
+                                onToggle={() => handleTogglePrimaryCategory(categoryOption)}
+                            />
+                        ))
+                    }
+                </div>
+                <p className="hint">Select the main category for this tool</p>
+            </div>
 
             <div className="flex flex-col gap-3">
                 <label>Categories *</label>

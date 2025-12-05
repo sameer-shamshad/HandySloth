@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Tool } from "../types";
+import type { Tool, ToolCategory } from "../types";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 import ToolImage from "../assets/tool-image.png";
@@ -11,7 +11,7 @@ import { fetchToolById } from "../services/tools.service";
 const ToolViewPage = () => {
   const { id } = useParams();
   const { state, send } = useTools();
-  const { tools: userTools } = useAppSelector((state) => state.user);
+  const { toolIds: userToolIds } = useAppSelector((state) => state.user);
   // Get tool from any of the arrays (recentTools, trendingTools, popularTools)
   const { recentTools, trendingTools, popularTools } = state.context;
   const allTools = [...recentTools, ...trendingTools, ...popularTools];
@@ -93,7 +93,7 @@ const ToolViewPage = () => {
           <span className="material-symbols-outlined text-gray-400! text-lg!">
             signal_cellular_alt
           </span>
-          <span className="text-white text-sm">Data Analytics</span>
+          <span className="text-white text-sm">{tool?.primaryCategory}</span>
         </div>
 
         <div className="flex items-center ">
@@ -120,7 +120,7 @@ const ToolViewPage = () => {
               {tool?.name || "Open AI"}
             </h3>
             <p className="text-sm text-secondary-color -mt-2">
-              {tool?.category.join(', ')}
+              {tool?.primaryCategory}
             </p>
           </div>
 
@@ -223,7 +223,7 @@ const ToolViewPage = () => {
               >
                 <path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3q0-.405-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708M3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z" />
               </svg>
-              <span className="w-max">{userTools.length} tool{userTools.length > 1 ? 's' : ''}</span>
+              <span className="w-max">{userToolIds.length} tool{userToolIds.length > 1 ? 's' : ''}</span>
             </div>
 
             <div className="flex items-center gap-1 lg:gap-2 text-primary-color text-xs ml-auto">
@@ -261,7 +261,7 @@ const ToolViewPage = () => {
                     <span className="material-symbols-outlined text-gray-400! text-lg!">
                         signal_cellular_alt
                     </span>
-                    <span className="text-white text-sm">Data Analytics</span>
+                    <span className="text-white text-sm">{tool?.primaryCategory}</span>
                 </div>
 
                 <span className="w-full py-3 text-xs text-secondary-color text-center font-extralight mt-4 bg-gray-500/40 dark:bg-secondary-bg/30">
@@ -274,16 +274,9 @@ const ToolViewPage = () => {
                 *:text-black-color *:font-extralight *:bg-main-color *:dark:bg-secondary-bg/30 *:dark:text-secondary-color!"
             >
                 {
-                    [
-                        "Dummy Text here",
-                        "Dummy",
-                        "Dummy",
-                        "Dummy Text",
-                        "Dummy Text Here",
-                        "Dummy",
-                        "Dummy",
-                        "Dummy",
-                    ].map((text, index) => (<span key={index}>{text}</span>))
+                  tool?.category?.length > 0 && tool?.category?.map((text: ToolCategory, index: number) => (
+                    <span key={index}>{text}</span>
+                  ))
                 }
             </div>
 
@@ -318,17 +311,7 @@ const ToolViewPage = () => {
       </main>
 
       <main className="flex flex-col gap-4 bg-primary-bg px-6 py-15 rounded-3xl">
-        <p className="text-sm text-secondary-color font-extralight">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.
-        </p>
+        <p className="text-sm text-secondary-color font-extralight">{tool.fullDetail}</p>
         <button type="button" className="-mb-2 bg-secondary-bg! text-center! py-3!">Visit Website</button>
         <button type="button" className="-mb-2 bg-main-color! text-center! py-3! text-black-color!">Save</button>
       </main>

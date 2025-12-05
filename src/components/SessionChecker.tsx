@@ -10,7 +10,7 @@ import { clearUserData } from '../store/features/userReducer';
 export const SessionChecker = ({ children }: { children: ReactNode }) => {
   const dispatch = useAppDispatch();
   const { accessToken, isLoading, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { tools, bookmarkedTools } = useAppSelector((state) => state.user);
+  const { toolIds, bookmarkedToolIds } = useAppSelector((state) => state.user);
 
   // Check session on mount if we have a token
   useEffect(() => {
@@ -26,11 +26,11 @@ export const SessionChecker = ({ children }: { children: ReactNode }) => {
     
     if (!isAuthenticated && !accessToken && !refreshToken) {
       // Clear user data if not authenticated and no tokens exist
-      if (tools.length > 0 || bookmarkedTools.length > 0) {
+      if (toolIds.length > 0 || bookmarkedToolIds.length > 0) {
         dispatch(clearUserData());
       }
     }
-  }, [isAuthenticated, accessToken, tools.length, bookmarkedTools.length, dispatch]);
+  }, [isAuthenticated, accessToken, toolIds.length, bookmarkedToolIds.length, dispatch]);
 
   return <>{children}</>;
 };

@@ -1,14 +1,32 @@
+import { useEffect, useState } from 'react';
 import type { CategoryStats } from '../types';
 import CategoryStatInstance from '../components/CategoryStatInstance';
+import { fetchCategoryStats } from '../services/tools.service';
 
-const categories: CategoryStats[] = [
-    { id: '1', name: 'Category Name', tools: 10, votes: 20095, saved: 120 },
-    { id: '2', name: 'Market', tools: 6, votes: 32556, saved: 300 },
-    { id: '3', name: 'News', tools: 102, votes: 73847, saved: 210 },
-    // { id: '4', name: 'Developer', tools: 30, votes: 10256, saved: 10 },
-];
+const CategoriesPage = () => {
+    const [categories, setCategories] = useState<CategoryStats[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-const CategoriesPage = () => {  
+    useEffect(() => {
+        const loadCategoryStats = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const stats = await fetchCategoryStats();
+                setCategories(stats);
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : 'Failed to load category stats';
+                setError(errorMessage);
+                console.error('Failed to fetch category stats:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadCategoryStats();
+    }, []);
+
     return (
         <section className="flex flex-col">
             <h3 className='text-primary-color md:text-2xl px-5 pb-8 lg:pb-5'>Categories</h3>
@@ -23,13 +41,17 @@ const CategoriesPage = () => {
                 <span>SAVED</span>
             </div>
             <div className='flex flex-col bg-primary-bg rounded-bl-3xl rounded-br-3xl px-4 pb-7 xl:px-12 lg:pt-6 sm:pb-18'>
-                {
-                    categories.length > 0 ? categories.map((category, index) => (
-                        <CategoryStatInstance key={category.id} category={category} index={index} />
-                    )) : (
-                        <p>No categories found</p>
-                    )
-                }
+                {isLoading ? (
+                    <p className='text-center text-secondary-color py-8'>Loading categories...</p>
+                ) : error ? (
+                    <p className='text-center text-red-500 py-8'>{error}</p>
+                ) : categories.length > 0 ? (
+                    categories.map((category, index) => (
+                        <CategoryStatInstance key={category.name} category={category} index={index} />
+                    ))
+                ) : (
+                    <p className='text-center text-secondary-color py-8'>No categories found</p>
+                )}
             </div>
         </section>
     );

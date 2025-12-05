@@ -12,17 +12,16 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAuth();
   const userId = user?._id;
-  const { bookmarkedTools } = useAppSelector((state) => state.user);
+  const { bookmarkedToolIds } = useAppSelector((state) => state.user);
 
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
   useEffect(() => {
-    if (isAuthenticated && bookmarkedTools.length > 0) {
-      console.log("Looged now")
-      setIsBookmarked(bookmarkedTools.includes(tool._id));
+    if (isAuthenticated && bookmarkedToolIds.length > 0) {
+      setIsBookmarked(bookmarkedToolIds.includes(tool._id));
     }
-  }, [userId, isAuthenticated, bookmarkedTools]);
+  }, [tool._id, isAuthenticated, bookmarkedToolIds]);
 
   const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -66,7 +65,7 @@ const ToolCard = memo(({ tool, tag }: {tool: Tool, tag: string }) => {
         <img src={tool.logo} alt={tool.name} className="h-10 w-10 lg:h-12 lg:w-12 rounded-lg object-cover shadow-[0_0_50px_1px_#A9ECEC] dark:shadow-[0_0_30px_1px_#A9ECEC4D]" />
         <div>
           <p className="text-base font-semibold text-primary-color">{tool.name}</p>
-          <p className="text-[11px] uppercase tracking-wide text-secondary-color mt-1">{tool.category.join(', ')}</p>
+          <p className="text-[11px] uppercase tracking-wide text-secondary-color mt-1">{tool.primaryCategory}</p>
           <p className="text-xs text-secondary-color font-maven-pro my-1">{tool.shortDescription}</p>
         </div>
         <span className="absolute -top-3 left-0 rounded-md bg-main-color w-14 text-center py-1 text-sm font-medium text-black-color">

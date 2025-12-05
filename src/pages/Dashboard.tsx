@@ -1,13 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import ToolList from '../components/Profile/ToolList';
 import { useTools } from '../context/ToolsProvider';
+import ToolList from '../components/Profile/ToolList';
 import ProfileCard from '../components/Profile/ProfileCard';
+import { useAppSelector } from '../store/hooks';
 import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
-import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { clearUserData } from '../store/features/userReducer';
-import { fetchToolsByIds } from '../services/tools.service';
-import { useAuth } from '../hooks/useAuth';
 
 const profileStats = [
   {
@@ -18,76 +14,46 @@ const profileStats = [
   {
     icon: "bookmarks",
     label: 'Bookmarks',
-    value: 10,
+    value: 0,
   },
   {
     icon: "votes",
     label: 'Votes',
-    value: 23,
+    value: 0,
   },
   {
     icon: "comments",
     label: 'Comments',
-    value: 12,
+    value: 0,
   },
 ];
 
 const DashboardPage = () => {
   const isLoading = false; // Set to true when fetching data
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const { state: toolsState } = useTools();
-  const { isAuthenticated, accessToken } = useAuth();
-  const { tools: userToolIds, bookmarkedTools: bookmarkedToolIds } = useAppSelector((state) => state.user);
-  const [bookmarkedToolsForDisplay, setBookmarkedToolsForDisplay] = useState<Array<{ name: string; logo: string }>>([]);
-
-  // // Clear user data if user is not authenticated and has no tokens
-  // useEffect(() => {
-  //   const accessToken = localStorage.getItem('accessToken');
-  //   const refreshToken = localStorage.getItem('refreshToken');
-    
-  //   if (!isAuthenticated && !accessToken && !refreshToken) {
-  //     // Clear user data if not authenticated and no tokens exist
-  //     if (userToolIds.length > 0 || bookmarkedToolIds.length > 0) {
-  //       dispatch(clearUserData());
-  //     }
-  //   }
-  // }, [isAuthenticated, userToolIds.length, bookmarkedToolIds.length, dispatch]);
-
-  // // Fetch first 5 bookmarked tools for display
-  // useEffect(() => {
-  //   const fetchBookmarksForDisplay = async () => {
-  //     if (bookmarkedToolIds.length === 0) {
-  //       setBookmarkedToolsForDisplay([]);
-  //       return;
-  //     }
-
-  //     try {
-  //       const firstFiveIds = bookmarkedToolIds.slice(0, 5);
-  //       const tools = await fetchToolsByIds(firstFiveIds);
-  //       setBookmarkedToolsForDisplay(tools.map(tool => ({
-  //         name: tool.name,
-  //         logo: tool.logo,
-  //       })));
-  //     } catch (error) {
-  //       console.error('Failed to fetch bookmarked tools for display:', error);
-  //       setBookmarkedToolsForDisplay([]);
-  //     }
-  //   };
-
-  //   fetchBookmarksForDisplay();
-  // }, [bookmarkedToolIds]);
+  const { toolIds: userToolIds, bookmarkedToolIds, upvotedToolIds, bookmarkedToolsDisplay } = useAppSelector((state) => state.user);
 
   const toolsCount = userToolIds.length;
   const bookmarksCount = bookmarkedToolIds.length;
+  const upvotesCount = upvotedToolIds.length;
 
-  // Update tools count and bookmarks count dynamically
+  // Transform bookmarkedToolsDisplay to format expected by ToolList
+  const bookmarkedToolsForDisplay = bookmarkedToolsDisplay.map(tool => ({
+    name: tool.name,
+    logo: tool.logo,
+  }));
+
+  // Update tools count, bookmarks count, and votes count dynamically
   const updatedProfileStats = profileStats.map(stat => {
     if (stat.icon === "tools") {
       return { ...stat, value: toolsCount };
     }
     if (stat.icon === "bookmarks") {
       return { ...stat, value: bookmarksCount };
+    }
+    if (stat.icon === "votes") {
+      return { ...stat, value: upvotesCount };
     }
     return stat;
   });

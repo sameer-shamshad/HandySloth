@@ -1,9 +1,8 @@
 export interface CategoryStats {
-  id: string;
   name: string;
-  tools: number;
-  votes: number;
-  saved: number;
+  totalTools: number;
+  totalVotes: number;
+  totalBookmarks: number;
 }
 
 export interface SocialLinks {
@@ -43,12 +42,14 @@ export interface Tool {
   shortDescription?: string;
   fullDetail?: string;
   toolImages?: string[];
+  primaryCategory: ToolCategory;
   category: ToolCategory[];
   tags: ToolTag[];
   views: number;
   createdAt: string;
   updatedAt: string;
   bookmarks: User["_id"][];
+  votes: User["_id"][];
   logo: string;
   links: SocialLinks;
   author?: {
@@ -57,7 +58,21 @@ export interface Tool {
   };
 }
 
-export type NewTool = Omit<Tool, '_id' | 'views' | 'createdAt' | 'updatedAt' | 'bookmarks'>;
+export type NewTool = Omit<Tool, '_id' | 'views' | 'createdAt' | 'updatedAt' | 'bookmarks' | 'votes'>;
+
+export interface ToolCard {
+  _id: string;
+  name: string;
+  logo: string;
+  category: ToolCategory[];
+  links: SocialLinks;
+}
+
+export interface UserBookmarkedTool {
+  _id: string;
+  name: string;
+  logo: string;
+}
 
 export type Contact = {
   firstName: string;

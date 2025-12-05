@@ -4,7 +4,7 @@ import { useAppSelector } from '../store/hooks';
 import { fetchToolsByIds } from '../services/tools.service';
 import type { Tool } from '../types';
 const MyToolsPage = () => {
-    const { tools: toolIds } = useAppSelector((state) => state.user);
+    const { toolIds } = useAppSelector((state) => state.user);
     const [tools, setTools] = useState<Tool[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 

@@ -2,11 +2,11 @@ import type { Tool } from '../../types';
 import { assign, setup, fromPromise } from 'xstate';
 import { fetchRecentTools, fetchTrendingTools } from '../../services/tools.service';
 
-const sortBy = (tools: Tool[], key: 'views') => [...tools].sort((a, b) => b[key] - a[key]);
+const sortByViews = (tools: Tool[]) => [...tools].sort((a, b) => b.views.length - a.views.length);
 
 // Helper functions for backward compatibility (for pages that might still use them)
-export const selectTrendingTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
-export const selectPopularTools = (tools: Tool[], limit = 5) => sortBy(tools, 'views').slice(0, limit);
+export const selectTrendingTools = (tools: Tool[], limit = 5) => sortByViews(tools).slice(0, limit);
+export const selectPopularTools = (tools: Tool[], limit = 5) => sortByViews(tools).slice(0, limit);
 export const selectRecentTools = (tools: Tool[], limit = 5) => [...tools].sort((a, b) => {
   return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 }).slice(0, limit);

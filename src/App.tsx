@@ -12,6 +12,7 @@ import {
   DashboardPage, 
   ToolViewPage, 
   CreateToolPage, 
+  UpdateToolPage,
   MyToolsPage,
   MyBookmarksPage,
   CategoryPage,
@@ -31,6 +32,7 @@ const App = () => {
           <Route path='/submit' element={<SubmitToolPage />} />
           <Route path='/contact' element={<ContactPage />} />
           <Route path='/tool/:id' element={<ToolViewPage />} />
+          <Route path='/tool/edit-tool' element={<UpdateToolPage />} />
           <Route path='/submit/create-tool' element={<CreateToolPage />} />
           <Route path='/my-tools' element={<MyToolsPage />} />
           <Route path='/my-bookmarks' element={<MyBookmarksPage />} />

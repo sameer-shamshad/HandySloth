@@ -1,10 +1,9 @@
 import type { RootState, AppDispatch } from "../store";
 import { logoutThunk, checkSessionThunk } from "./AuthReducer";
+import type { ToolCard, UserBookmarkedTool } from "../../types";
 import { createReducer, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import { fetchUserToolIds, fetchBookmarkedToolIds, fetchUpvotedToolIds, fetchBookmarkedTools } from "../../services/tools.service";
-import type { Tool, UserBookmarkedTool } from "../../types";
 
-// localStorage key for persisting user state
 const USER_STATE_KEY = 'userState';
 
 type UserState = {
@@ -12,10 +11,10 @@ type UserState = {
   bookmarkedToolIds: string[]; // Array of bookmarked tool IDs
   upvotedToolIds: string[]; // Array of upvoted tool IDs
 
-  tools: Tool[]; // Array of tools
-  bookmarkedTools: Tool[]; // Array of bookmarked tools
+  tools: ToolCard[]; // Array of tools
+  bookmarkedTools: ToolCard[]; // Array of bookmarked tools
   bookmarkedToolsDisplay: UserBookmarkedTool[]; // Array of bookmarked tools for display (name, logo)
-  upvotedTools: Tool[]; // Array of upvoted tools
+  upvotedTools: ToolCard[]; // Array of upvoted tools
   isLoadingTools: boolean;
   isLoadingBookmarks: boolean;
   isLoadingBookmarkedToolsDisplay: boolean;
@@ -32,8 +31,8 @@ const saveToLocalStorage = (state: UserState) => {
     // Only save tool IDs, not loading states or errors
     const stateToSave = {
       toolIds: state.toolIds,
-      bookmarkedToolIds: state.bookmarkedToolIds,
       upvotedToolIds: state.upvotedToolIds,
+      bookmarkedToolIds: state.bookmarkedToolIds,
     };
     localStorage.setItem(USER_STATE_KEY, JSON.stringify(stateToSave));
   } catch (error) {

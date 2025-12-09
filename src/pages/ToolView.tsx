@@ -1,28 +1,26 @@
+import { useAuth } from "../context";
 import { useState, useEffect } from "react";
-import type { Tool, ToolCategory } from "../types";
-import { useParams, Link } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
-import { useTools } from "../context/ToolsProvider";
-import ToolNotFound from "../components/Tools/ToolNotFound";
-import ToolCommunityRatings from "../components/Tools/ToolCommunityRatings";
-import { fetchToolById } from "../services/tools.service";
 import { formatRelativeTime } from "../utils/time";
+import type { Tool, ToolCategory } from "../types";
+import { fetchToolById, incrementToolView } from "../services/tools.service";
+import ToolNotFound from "../components/Tools/ToolNotFound";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import ToolCommunityRatings from "../components/Tools/ToolCommunityRatings";
 
 const ToolViewPage = () => {
   const { id } = useParams();
-  const { state, send } = useTools();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const { toolIds: userToolIds } = useAppSelector((state) => state.user);
-  // Get tool from any of the arrays (recentTools, trendingTools, popularTools)
-  const { recentTools, trendingTools, popularTools } = state.context;
-  const allTools = [...recentTools, ...trendingTools, ...popularTools];
-  const tool = allTools.find((tool: Tool) => tool._id === id);
   
-  const [isLoading, setIsLoading] = useState<boolean>(true); // Start with loading - will fetch on mount
+  const [tool, setTool] = useState<Tool | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [popularAlternative, setPopularAlternative] = useState<{ _id: string; name: string; totalSaved: number; totalAlternatives: number } | null>(null);
 
-  // Fetch tool by ID from API and update/add to machine
+  // Fetch tool by ID from API
   useEffect(() => {
     if (!id) {
       setFetchError(true);
@@ -32,7 +30,7 @@ const ToolViewPage = () => {
 
     let isCancelled = false;
 
-    const fetchAndUpdateTool = async () => {
+    const fetchTool = async () => {
       setFetchError(false);
       setIsLoading(true);
       
@@ -42,7 +40,9 @@ const ToolViewPage = () => {
         if (isCancelled) return;
         
         const fetchedTool = response.tool;
-        console.log(response);
+        
+        // Set the tool in state
+        setTool(fetchedTool);
         
         // Set popular alternative from the response
         if (response.alternative) {
@@ -52,17 +52,6 @@ const ToolViewPage = () => {
             totalSaved: response.alternative.totalSaved || 0,
             totalAlternatives: response.alternative.totalAlternatives || 0,
           });
-        }
-
-        // Check if tool exists in any of the machine arrays (recentTools, trendingTools, popularTools)
-        const { recentTools, trendingTools, popularTools } = state.context;
-        const allTools = [...recentTools, ...trendingTools, ...popularTools];
-        const toolExists = allTools.some((t) => t._id === fetchedTool._id);
-        
-        if (toolExists) { // Tool exists in machine, update it with latest data
-          send({ type: 'UPDATE_TOOL', tool: fetchedTool });
-        } else { // Tool doesn't exist in machine, add it
-          send({ type: 'ADD_TOOL', tool: fetchedTool });
         }
         
         setFetchError(false);
@@ -78,13 +67,44 @@ const ToolViewPage = () => {
       }
     };
 
-    fetchAndUpdateTool();
+    fetchTool();
     
     return () => {
       isCancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]); // Only fetch when id changes
+  }, [id]);
+
+  useEffect(() => {
+    if (!id || !tool || !isAuthenticated || !user?._id) {
+      return;
+    }
+
+    // Check if user ID is already in views array - if yes, don't make API call
+    const hasViewed = tool.views?.includes(user._id);
+    if (hasViewed) return; // User already viewed, no need to increment
+
+    // Increment view
+    const incrementView = async () => {
+      try {
+        await incrementToolView(id);
+        
+        setTool((prevTool) => {
+          if (!prevTool) return prevTool;
+
+          return { ...prevTool, views: [...(prevTool.views || []), user._id!] };
+        });
+      } catch (error) {
+        console.error('Failed to increment tool view:', error);
+        // Silently fail - don't show error to user
+      }
+    };
+
+    incrementView();
+  }, [id, tool, isAuthenticated, user?._id]);
+
+  const handleEditTool = () => {
+    navigate(`/tool/edit-tool`, { state: { tool } });
+  };
 
   const handleBookmark = () => {
     setIsBookmarked((prev) => !prev);
@@ -246,19 +266,35 @@ const ToolViewPage = () => {
               <span className="w-max">{userToolIds.length} tool{userToolIds.length > 1 ? 's' : ''}</span>
             </div>
 
-            <div className="flex items-center gap-1 lg:gap-2 text-primary-color text-xs ml-auto">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                className="bi bi-envelope-fill"
-                viewBox="0 0 16 16"
-              >
-                <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z" />
-              </svg>
-              <span>Message</span>
-            </div>
+            {
+              isAuthenticated && user && tool?.author?._id === user._id ? (
+                <button 
+                  type="button"
+                  onClick={handleEditTool}
+                  className="flex items-center gap-1 lg:gap-2! bg-transparent! text-primary-color text-xs ml-auto"
+                >
+                  <span className="material-symbols-outlined text-[16px]!">edit</span>
+                  <span>Edit Tool</span>
+                </button>
+              ) : (
+                <button 
+                  type="button"
+                  className="flex items-center gap-1 lg:gap-2 bg-transparent! text-primary-color text-xs ml-auto"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    className="bi bi-envelope-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z" />
+                  </svg>
+                  <span>Message</span>
+                </button>
+              )
+            }
           </div>
         </div>
         <p className="text-xs text-secondary-color">{tool?.shortDescription}</p>

@@ -45,7 +45,7 @@ export interface Tool {
   primaryCategory: ToolCategory;
   category: ToolCategory[];
   tags: ToolTag[];
-  views: number;
+  views: User["_id"][]; // Array of user IDs who viewed the tool
   createdAt: string;
   updatedAt: string;
   bookmarks: User["_id"][];
@@ -55,17 +55,46 @@ export interface Tool {
   author?: {
     _id: string;
     username: string;
+    totalTools?: number;
   };
 }
 
 export type NewTool = Omit<Tool, '_id' | 'views' | 'createdAt' | 'updatedAt' | 'bookmarks' | 'votes'>;
 
+export interface CreateToolInput {
+  name: string;
+  logo: string;
+  primaryCategory: ToolCategory;
+  category: ToolCategory[];
+  shortDescription: string;
+  fullDetail: string;
+  toolImages: string[];
+  tags: string[];
+  links: SocialLinks;
+}
+
+export interface UpdateToolInput {
+  _id: string;
+  name: string;
+  logo: string;
+  primaryCategory: ToolCategory;
+  category: ToolCategory[];
+  shortDescription: string;
+  fullDetail: string;
+  toolImages: string[];
+  tags: string[];
+  links: SocialLinks;
+}
+
 export interface ToolCard {
   _id: string;
   name: string;
   logo: string;
-  category: ToolCategory[];
+  primaryCategory: ToolCategory;
+  shortDescription: string;
   links: SocialLinks;
+  bookmarks: User["_id"][];
+  createdAt: Date | string;
 }
 
 export interface UserBookmarkedTool {

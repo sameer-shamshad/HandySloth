@@ -1,6 +1,6 @@
 import axios from '../lib/axios';
 import { AxiosError } from 'axios';
-import type { Tool, ToolCategory, User, UserBookmarkedTool } from '../types';
+import type { Tool, ToolCard, User, UserBookmarkedTool, CreateToolInput } from '../types';
 
 interface CreateToolRequest {
   name: string;
@@ -19,34 +19,13 @@ interface CreateToolRequest {
 }
 
 interface CreateToolResponse {
-  tool: Tool;
+  tool: ToolCard;
   message: string;
 }
 
-interface CreateToolInput {
-  name: string;
-  logo?: string;
-  category: ToolCategory[]; // Array format from machine context
-  primaryCategory: ToolCategory; // Required primary category (single value)
-  shortDescription?: string;
-  fullDetail?: string;
-  toolImages?: string[];
-  tags: string[];
-  links: {
-    telegram: string;
-    x: string;
-    website: string;
-  };
-}
-
-export const createTool = async (tool: CreateToolInput): Promise<Tool> => {
+export const createTool = async (tool: CreateToolInput): Promise<ToolCard> => {
   try {
-    const requestData: CreateToolRequest = {
-      ...tool,
-      category: tool?.category || [],
-    };
-
-    const response = await axios.post<CreateToolResponse>('/api/tool', requestData);
+    const response = await axios.post<CreateToolResponse>('/api/tool', tool);
     
     if (response.status !== 201) {
       throw new Error(response.data.message || 'Failed to create tool');
@@ -56,6 +35,28 @@ export const createTool = async (tool: CreateToolInput): Promise<Tool> => {
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to create tool');
+    }
+    throw error;
+  }
+};
+
+interface UpdateToolResponse {
+  tool: ToolCard;
+  message: string;
+}
+
+export const updateTool = async (toolId: string, tool: CreateToolInput): Promise<ToolCard> => {
+  try {
+    const response = await axios.put<UpdateToolResponse>(`/api/tool/${toolId}`, tool);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to update tool');
+    }
+
+    return response.data.tool;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to update tool');
     }
     throw error;
   }
@@ -274,6 +275,27 @@ export const downvoteTool = async (toolId: string): Promise<UpvotedTool> => {
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to downvote tool');
+    }
+    throw error;
+  }
+};
+
+interface IncrementViewResponse {
+  message: string;
+}
+
+export const incrementToolView = async (toolId: string): Promise<IncrementViewResponse> => {
+  try {
+    const response = await axios.post<IncrementViewResponse>(`/api/tool/${toolId}/view`);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to increment tool view');
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to increment tool view');
     }
     throw error;
   }

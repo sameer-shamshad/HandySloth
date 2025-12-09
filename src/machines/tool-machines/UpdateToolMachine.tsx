@@ -1,14 +1,15 @@
 import { assign, fromPromise, setup } from "xstate";
-import type { NewTool, ToolCategory, ToolTag, SocialLinks, ToolCard, CreateToolInput } from "../../types";
-import { createTool as createToolApi } from "../../services/tools.service";
+import { updateTool as updateToolApi } from "../../services/tools.service";
+import type { Tool, NewTool, ToolCategory, ToolTag, SocialLinks, ToolCard, UpdateToolInput } from "../../types";
 
-const createToolMachine = setup({
+const updateToolMachine = setup({
   types: {
     context: {} as {
+      _id: string;
       name: string;
       logo: string;
-      category: ToolCategory[];
       primaryCategory: ToolCategory;
+      category: ToolCategory[];
       shortDescription: string;
       fullDetail: string;
       toolImages: string[];
@@ -20,11 +21,12 @@ const createToolMachine = setup({
     events: {} as
       | { type: 'CHANGE_FIELD'; field: keyof NewTool; value: NewTool[keyof NewTool] }
       | { type: 'SUBMIT' }
-      | { type: 'RESET' },
+      | { type: 'RESET' }
+      | { type: 'INIT'; tool: Tool },
   },
   actors: {
-    createTool: fromPromise(async ({ input }: { input: CreateToolInput }) => {
-      const response = await createToolApi(input);
+    updateTool: fromPromise(async ({ input }: { input: UpdateToolInput }) => {
+      const response = await updateToolApi(input._id, input);
       return response;
     }),
   },
@@ -41,24 +43,30 @@ const createToolMachine = setup({
       return { ...context, error: errorMessage };
     }),
     clearError: assign(({ context }) => ({ ...context, error: null })),
-    clearForm: assign(({ context }) => ({
-      ...context,
-      name: '',
-      logo: 'https://picsum.photos/200',
-      category: [],
-      primaryCategory: '' as ToolCategory,
-      shortDescription: '',
-      fullDetail: '',
-      toolImages: [],
-      tags: [],
-      links: {
-        telegram: '',
-        x: '',
-        website: '',
-      },
-      error: null,
-      toolResponse: null,
-    })),
+    initializeTool: assign(({ context, event }) => {
+      if (event.type !== 'INIT') return context;
+
+      const tool = event.tool as Tool;
+      return {
+        ...context,
+        _id: tool._id,
+        name: tool.name,
+        logo: tool.logo,
+        category: tool.category || [],
+        primaryCategory: (tool.primaryCategory || '') as ToolCategory,
+        shortDescription: tool.shortDescription || '',
+        fullDetail: tool.fullDetail || '',
+        toolImages: tool.toolImages || [],
+        tags: tool.tags || [],
+        links: tool.links || {
+          telegram: '',
+          x: '',
+          website: '',
+        error: null,
+        toolResponse: null,
+        },
+      };
+    }),
     setValidationError: assign(({ context }) => {
       const name = context.name.trim();
       const logo = context.logo.trim();
@@ -105,14 +113,14 @@ const createToolMachine = setup({
     },
   },
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QGMBOYCGAXMAVA9vgDYCyGyAFgJYB2YAdFREWAMQDCAEgIIByA4gFEA+gDEAkoIAyAEQDaABgC6iUAAd8sKlir4aqkAA9EAdgCM9AJyWAbAoAcJkwFYFAZhtmXAGhABPRDNLC0tnNzM3e3tnACZ7GLcnAF8k3zRMHAJiMkpaBiYWVgBlAFUAIRJxXEUVJBANLR09A2MEOLcrExtnF3tQ2JjbXwCEcJN6DxMYhRsYwcT7MxsUtPRsPEJScmo6RmY2UoqquTNa9U1tXX061oAWEOtHp8f7G2HEUImXBQVLW5tbs5LK97CsQOl1lktrldrAAK4AIwAttodDQoKwIHp8jQAG74ADWDAhmU2OR2DHhyNRtCgCFo+OQ2CuNRqBgal2aN1MCXo7giPzMXnst0S71GCmc9EBko8Zn+ChcJjBJI22W2eXoVJRWDRGLAqFQ+FQ9DURGwADNjUj6KqoeTNdqaej6Xj8EymjRWcp2RdPS1EG4evQTH0ZrcFLdLDETJK3v5EHMOqHLIqzNMfk5LCq1qT1TDKXDkMg4LBWIZYFh1vQMBacKgABRmH4KACUrDtZI1sKLJdgsDZdQ5-u5CBcUpjblu9iDziFi3Fi3orhbHmitxjXRSqRANHwEDgBk7+YpvsaVwDCAAtDY+S37w-5eKbzmMmroRS9iwz5zrqBWgC9DxO4DiJGYfRuHE4rzMu4QxDY8T3JGUTOK+kJdgWWqIjqeo-iO-6ILE9jLoqIo-JBSyWG44puO4Vh9HY4FTKKERoXmH6Or2pZ4Reo59Lcy7RNYNgIeY5jODRMQhDMcTTAhYyoduQA */
-  id: 'createToolMachine',
+  id: 'updateToolMachine',
   initial: 'idle',
   context: {
+    _id: '',
     name: '',
     logo: '',
     category: [],
-    primaryCategory: '',
+    primaryCategory: '' as ToolCategory,
     shortDescription: '',
     fullDetail: '',
     toolImages: [],
@@ -129,6 +137,7 @@ const createToolMachine = setup({
     idle: {
       entry: 'clearError',
       on: {
+        INIT: { actions: 'initializeTool' },
         CHANGE_FIELD: { actions: 'changeField' },
         SUBMIT: [
           {
@@ -145,10 +154,10 @@ const createToolMachine = setup({
     },
     submitting: {
       invoke: {
-        src: 'createTool',
-        input: ({ context }: { context: CreateToolInput }) => {
-          
+        src: 'updateTool',
+        input: ({ context }: { context: UpdateToolInput }) => {
           return {
+            _id: context._id,
             name: context.name,
             logo: context.logo,
             category: context.category,
@@ -172,11 +181,11 @@ const createToolMachine = setup({
     },
     success: {
       after: {
-        1000: { target: 'idle', actions: 'clearForm' },
+        1000: { target: 'idle' },
       },
     },
   },
 });
 
-export default createToolMachine;
+export default updateToolMachine;
 

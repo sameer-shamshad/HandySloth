@@ -77,7 +77,9 @@ export const register = async (userData: RegisterRequest): Promise<AuthResponse>
 };
 
 interface RefreshAccessTokenResponse {
+  user: User;
   accessToken: string;
+  refreshToken: string;
 }
 
 export const refreshAccessToken = async (refreshToken: string): Promise<RefreshAccessTokenResponse> => {

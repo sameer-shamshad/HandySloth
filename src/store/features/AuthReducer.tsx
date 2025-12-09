@@ -58,11 +58,11 @@ export const checkSessionThunk = createAsyncThunk<
             localStorage.setItem('accessToken', refreshResponse.accessToken);
             
             if (!localStorage.getItem('refreshToken')) {
-              localStorage.setItem('refreshToken', refreshToken);
+              localStorage.setItem('refreshToken', refreshResponse.refreshToken);
             }
             
             return {
-              user,
+              user: { ...refreshResponse.user },
               accessToken: refreshResponse.accessToken,
               refreshToken: refreshToken,
             };

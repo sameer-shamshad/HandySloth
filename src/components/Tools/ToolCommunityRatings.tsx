@@ -158,7 +158,7 @@ const ToolCommunityRatings = ({ tool, onToolUpdate }: ToolCommunityRatingsProps)
   };
 
   return (
-    <div className="flex flex-col gap-12 bg-transparent lg:bg-primary-bg px-3 lg:px-6 py-4 rounded-3xl">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 bg-transparent lg:bg-primary-bg px-3 lg:px-6 py-4 rounded-3xl">
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-bold text-primary-color">Community Ratings</h3>
 

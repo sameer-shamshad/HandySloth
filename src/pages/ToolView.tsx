@@ -74,33 +74,23 @@ const ToolViewPage = () => {
     };
   }, [id]);
 
+  // Increment tool view on page load (IP-based, no authentication needed)
   useEffect(() => {
-    if (!id || !tool || !isAuthenticated || !user?._id) {
+    if (!id || !tool) {
       return;
     }
 
-    // Check if user ID is already in views array - if yes, don't make API call
-    const hasViewed = tool.views?.includes(user._id);
-    if (hasViewed) return; // User already viewed, no need to increment
-
-    // Increment view
+    // Increment view (IP-based tracking handled by backend)
     const incrementView = async () => {
       try {
         await incrementToolView(id);
-        
-        setTool((prevTool) => {
-          if (!prevTool) return prevTool;
-
-          return { ...prevTool, views: [...(prevTool.views || []), user._id!] };
-        });
       } catch (error) {
         console.error('Failed to increment tool view:', error);
-        // Silently fail - don't show error to user
       }
     };
 
     incrementView();
-  }, [id, tool, isAuthenticated, user?._id]);
+  }, [id, tool]);
 
   const handleEditTool = () => {
     navigate(`/tool/edit-tool`, { state: { tool } });

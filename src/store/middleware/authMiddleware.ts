@@ -33,24 +33,26 @@ export const authMiddleware: Middleware = (store) => (next) => (action) => {
   
   // Trigger fetch on login/register (setAuthenticated) - only if localStorage is empty
   if (setAuthenticated.match(action)) {
-    if (!hasLocalStorageData()) {
-      // Only fetch if localStorage is empty
+    if (!hasLocalStorageData()) { // Only fetch IDs if localStorage is empty
       store.dispatch(fetchUserToolsThunk() as any);
       store.dispatch(fetchBookmarkedToolsThunk() as any);
-      store.dispatch(fetchBookmarkedToolsDisplayThunk() as any);
       store.dispatch(fetchUpvotedToolsThunk() as any);
     }
+
+    // Always fetch bookmarkedToolsDisplay since it's not persisted to localStorage
+    store.dispatch(fetchBookmarkedToolsDisplayThunk() as any);
   }
 
   // Also trigger fetch on session check success (page reload scenario) - only if localStorage is empty
   if (checkSessionThunk.fulfilled.match(action)) {
-    if (!hasLocalStorageData()) {
-      // Only fetch if localStorage is empty
+    if (!hasLocalStorageData()) { // Only fetch IDs if localStorage is empty
       store.dispatch(fetchUserToolsThunk() as any);
       store.dispatch(fetchBookmarkedToolsThunk() as any);
-      store.dispatch(fetchBookmarkedToolsDisplayThunk() as any);
       store.dispatch(fetchUpvotedToolsThunk() as any);
     }
+    
+    // Always fetch bookmarkedToolsDisplay since it's not persisted to localStorage
+    store.dispatch(fetchBookmarkedToolsDisplayThunk() as any);
   }
 
   return result;

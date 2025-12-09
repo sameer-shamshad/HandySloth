@@ -1,8 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useTools } from '../context/ToolsProvider';
 import ToolList from '../components/Profile/ToolList';
 import ProfileCard from '../components/Profile/ProfileCard';
-import { useAppSelector } from '../store/hooks';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { useAuth } from '../context';
+import { fetchBookmarkedToolsDisplayThunk } from '../store/features/userReducer';
 import ProfileStatsCard, { ProfileStatsCardSkeleton } from '../components/Profile/ProfileStatsCard';
 
 const profileStats = [
@@ -31,8 +34,17 @@ const profileStats = [
 const DashboardPage = () => {
   const isLoading = false; // Set to true when fetching data
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAuth();
   const { state: toolsState } = useTools();
-  const { toolIds: userToolIds, bookmarkedToolIds, upvotedToolIds, bookmarkedToolsDisplay } = useAppSelector((state) => state.user);
+  const { toolIds: userToolIds, bookmarkedToolIds, upvotedToolIds, bookmarkedToolsDisplay, isLoadingBookmarkedToolsDisplay } = useAppSelector((state) => state.user);
+
+  // Fetch bookmarked tools display if not already loaded and user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && bookmarkedToolsDisplay.length === 0 && !isLoadingBookmarkedToolsDisplay) {
+      dispatch(fetchBookmarkedToolsDisplayThunk());
+    }
+  }, [isAuthenticated, bookmarkedToolsDisplay.length, isLoadingBookmarkedToolsDisplay, dispatch]);
 
   const toolsCount = userToolIds.length;
   const upvotesCount = upvotedToolIds.length;

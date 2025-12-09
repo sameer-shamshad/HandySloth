@@ -177,6 +177,7 @@ export const fetchBookmarkedToolsDisplayThunk = createAsyncThunk<
 
     try {
       const tools = await fetchBookmarkedTools();
+
       return tools;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch bookmarked tools';

@@ -1,23 +1,43 @@
 import type { Tool } from '../../types';
-import { useAuth } from '../../context';
+import { useAuth, useModal } from '../../context';
 import { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { upvoteTool, downvoteTool } from '../../services/tools.service';
+import { upvoteTool, downvoteTool, addToolRating } from '../../services/tools.service';
 import { addUpvotedTool, removeUpvotedTool } from '../../store/features/userReducer';
+import AuthModal from '../AuthModal';
 
 interface ToolCommunityRatingsProps {
   tool: Tool | undefined;
+  onToolUpdate?: (updatedTool: Tool) => void;
 }
 
-const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
+const ToolCommunityRatings = ({ tool, onToolUpdate }: ToolCommunityRatingsProps) => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAuth();
+  const { openModal } = useModal();
   const userId = user?._id;
   const { upvotedToolIds } = useAppSelector((state) => state.user);
-  const [selectedRating, setSelectedRating] = useState<number>(5);
+  const [selectedRating, setSelectedRating] = useState<number>(3);
   const [feedback, setFeedback] = useState<string>('');
   const [isUpvoted, setIsUpvoted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isRatingLoading, setIsRatingLoading] = useState<boolean>(false);
+  const [hasRated, setHasRated] = useState<boolean>(false);
+  const [ratingError, setRatingError] = useState<string | null>(null);
+
+  // Check if user has already rated
+  useEffect(() => {
+    if (tool?.ratings && userId) {
+      const userRating = tool.ratings.find(r => r.userId === userId);
+      setHasRated(!!userRating);
+      if (userRating) {
+        setSelectedRating(userRating.rating);
+        setFeedback(userRating.feedback);
+      }
+    } else {
+      setHasRated(false);
+    }
+  }, [tool?.ratings, userId]);
 
   useEffect(() => {
     if (isAuthenticated && upvotedToolIds.length > 0) {
@@ -25,14 +45,82 @@ const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
     }
   }, [tool?._id, isAuthenticated, upvotedToolIds]);
 
+  // Calculate ratings statistics
+  const ratings = tool?.ratings || [];
+  const totalRatings = ratings.length;
+  
+  // Calculate average rating
+  const averageRating = totalRatings > 0
+    ? (ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings).toFixed(1)
+    : 0;
+
+  // Calculate star distribution (how many users rated each star level)
+  const starDistribution = [5, 4, 3, 2, 1].map(star => ({
+    stars: star,
+    count: ratings.filter(r => r.rating === star).length
+  }));
+
   const handleStarClick = (rating: number) => {
+    if (hasRated) return; // Disable star clicks if user has already rated
     setSelectedRating(rating);
   };
 
-  const handlePost = () => {
-    // Handle post logic here
-    console.log('Posting rating:', selectedRating, feedback);
-    setFeedback('');
+  const handlePost = async () => {
+    if (!tool || isRatingLoading) return;
+    
+    // If user is not authenticated, show login modal
+    if (!isAuthenticated || !userId) {
+      openModal({
+        component: <AuthModal />,
+        title: '',
+        size: 'sm',
+      });
+      return;
+    }
+    
+    if (hasRated) { // Block if user has already rated (forever)
+      setRatingError('You have already rated this tool and cannot rate it again.');
+      return;
+    }
+    
+    if (!selectedRating || selectedRating < 1 || selectedRating > 5) {
+      setRatingError('Please select a rating between 1 and 5 stars');
+      return;
+    }
+
+    setIsRatingLoading(true);
+    setRatingError(null);
+
+    try {
+      await addToolRating(tool._id, selectedRating, feedback);
+      
+      if (tool && userId) {
+        const newRating = {
+          userId,
+          rating: selectedRating,
+          feedback,
+        };
+        const updatedTool: Tool = {
+          ...tool,
+          ratings: [...(tool.ratings || []), newRating],
+        };
+        
+        setHasRated(true); // Update local state
+        
+        if (onToolUpdate) { // Notify parent component to update tool
+          onToolUpdate(updatedTool);
+        }
+      }
+      
+      // Clear feedback after successful submission (but keep rating visible)
+      setFeedback('');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit rating';
+      setRatingError(errorMessage);
+      console.error('Failed to submit rating:', error);
+    } finally {
+      setIsRatingLoading(false);
+    }
   };
 
   const handleUpvote = async () => {
@@ -85,13 +173,15 @@ const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
           >
             <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
           </svg>
-          <span className="text-4xl font-bold text-primary-color">0</span>
+          <span className="text-4xl font-bold text-primary-color">{averageRating}</span>
         </div>
 
-        <p className="text-sm text-secondary-color">No ratings yet.</p>
+        {totalRatings === 0 && (
+          <p className="text-sm text-secondary-color">No ratings yet.</p>
+        )}
 
         <div className="w-full flex flex-col gap-2">
-          {[5, 4, 3, 2, 1].map((stars) => (
+          {starDistribution.map(({ stars, count }) => (
             <div key={stars} className="w-full sm:max-w-sm flex items-center justify-between gap-3 border-b py-3">
               <div className="flex items-center gap-1">
                 {[...Array(stars)].map((_, i) => (
@@ -109,7 +199,7 @@ const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
                 ))}
               </div>
 
-              <span className="text-xs text-secondary-color w-8 text-right">0</span>
+              <span className="text-xs text-secondary-color w-8 text-right">{count}</span>
             </div>
           ))}
         </div>
@@ -129,7 +219,8 @@ const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
               key={star}
               type="button"
               onClick={() => handleStarClick(star)}
-              className="focus:outline-none bg-transparent!"
+              disabled={hasRated}
+              className="focus:outline-none bg-transparent! disabled:opacity-80 disabled:cursor-not-allowed"
               aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
               title={`Rate ${star} star${star > 1 ? 's' : ''}`}
             >
@@ -138,7 +229,7 @@ const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
                 width="32"
                 height="32"
                 fill="currentColor"
-                className={`bi bi-star-fill text-primary-color dark:text-secondary-color'
+                className={`bi bi-star-fill ${star <= selectedRating ? 'text-main-color' : 'text-secondary-color'} dark:text-secondary-color'
                 }`}
                 viewBox="0 0 16 16"
               >
@@ -148,20 +239,38 @@ const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
           ))}
         </div>
 
-        <textarea
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-          placeholder={`Let people know what you think about ${tool?.name || 'this tool'}. It helps to provide much detail as possible about your experience.`}
-          className="w-full min-h-[120px] rounded-md border border-border-color bg-secondary-bg/40 px-4 py-3 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color resize-none"
-        />
+        {hasRated && isAuthenticated && (
+          <div className="text-sm text-secondary-color bg-secondary-bg/40 px-4 py-3 rounded-lg">
+            You have already rated this tool. You cannot rate it again.
+          </div>
+        )}
 
-        <button
-          type="button"
-          onClick={handlePost}
-          className="w-min rounded-md bg-[#3E3E3E]! dark:bg-[#404758]! px-8! py-3! text-sm font-medium text-white!"
-        >
-          Post
-        </button>
+        {!hasRated && (
+          <>
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder={`Let people know what you think about ${tool?.name || 'this tool'}. It helps to provide much detail as possible about your experience.`}
+              className="w-full min-h-[120px] rounded-md border border-border-color bg-secondary-bg/40 px-4 py-3 text-sm text-primary-color placeholder:text-secondary-color focus:border-transparent focus:outline-none focus:ring focus:ring-main-color resize-none"
+              disabled={isRatingLoading || hasRated}
+            />
+
+            {ratingError && (
+              <div className="text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-lg">
+                {ratingError}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handlePost}
+              disabled={isRatingLoading || !selectedRating || hasRated}
+              className="w-min rounded-md bg-[#3E3E3E]! dark:bg-[#404758]! px-8! py-3! text-sm font-medium text-white! disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isRatingLoading ? 'Submitting...' : 'Post'}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Upvote Section */}
@@ -191,4 +300,3 @@ const ToolCommunityRatings = ({ tool }: ToolCommunityRatingsProps) => {
 };
 
 export default ToolCommunityRatings;
-

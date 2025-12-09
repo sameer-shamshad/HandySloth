@@ -1,6 +1,6 @@
 import type { Middleware } from '@reduxjs/toolkit';
 import { setAuthenticated, checkSessionThunk } from '../features/AuthReducer';
-import { fetchUserToolsThunk, fetchBookmarkedToolsThunk, fetchBookmarkedToolsDisplayThunk, fetchUpvotedToolsThunk, loadPersistedUserState } from '../features/userReducer';
+import { fetchUserToolsThunk, fetchBookmarkedToolsThunk, fetchBookmarkedToolsDisplayThunk, fetchUpvotedToolsThunk } from '../features/userReducer';
 
 /**
  * Helper to check if localStorage has data

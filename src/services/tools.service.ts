@@ -285,6 +285,55 @@ export const incrementToolView = async (toolId: string): Promise<IncrementViewRe
   }
 };
 
+interface AddRatingRequest {
+  rating: number;
+  feedback: string;
+}
+
+interface RatingResponse {
+  message: string;
+}
+
+export const addToolRating = async (toolId: string, rating: number, feedback: string): Promise<RatingResponse> => {
+  try {
+    const response = await axios.post<RatingResponse>(`/api/tool/${toolId}/rating`, {
+      rating,
+      feedback,
+    } as AddRatingRequest);
+    
+    if (response.status !== 200 && response.status !== 201) {
+      throw new Error(response.data.message || 'Failed to add rating');
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to add rating');
+    }
+    throw error;
+  }
+};
+
+export const updateToolRating = async (toolId: string, rating: number, feedback: string): Promise<RatingResponse> => {
+  try {
+    const response = await axios.put<RatingResponse>(`/api/tool/${toolId}/rating`, {
+      rating,
+      feedback,
+    } as AddRatingRequest);
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to update rating');
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to update rating');
+    }
+    throw error;
+  }
+};
+
 interface FetchUserToolsResponse {
   toolIds: string[];
   message: string;

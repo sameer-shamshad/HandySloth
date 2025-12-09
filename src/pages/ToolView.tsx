@@ -403,7 +403,10 @@ const ToolViewPage = () => {
         <button type="button" className="-mb-2 bg-main-color! text-center! py-3! text-black-color!">Save</button>
       </main>
 
-      <ToolCommunityRatings tool={tool} />
+      <ToolCommunityRatings 
+        tool={tool} 
+        onToolUpdate={(updatedTool) => setTool(updatedTool)}
+      />
     </div>
   );
 };

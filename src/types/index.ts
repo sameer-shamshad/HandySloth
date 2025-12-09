@@ -36,6 +36,12 @@ export type ToolTag = 'Free'
   | 'Self-hosted' 
   | 'AI Powered';
 
+export interface ToolRating {
+  userId: User["_id"];
+  rating: number;
+  feedback: string;
+}
+
 export interface Tool {
   _id: string;
   name: string;
@@ -46,6 +52,7 @@ export interface Tool {
   category: ToolCategory[];
   tags: ToolTag[];
   views: User["_id"][]; // Array of user IDs who viewed the tool
+  ratings: ToolRating[]; // Array of ratings with userId, rating, and feedback
   createdAt: string;
   updatedAt: string;
   bookmarks: User["_id"][];

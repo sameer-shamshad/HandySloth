@@ -303,7 +303,7 @@ const ToolViewPage = () => {
       <main className="h-min flex flex-col xl:flex-row gap-6 bg-primary-bg xl:bg-transparent px-3 xl:-mx-6 py-8 rounded-3xl">
         <div className="w-full flex flex-col gap-4 overflow-y-auto">
           {
-            Array.isArray(tool?.toolImages) && tool.toolImages.length > 0 && tool.toolImages.filter((v, i) => i === 0).map((image: string, index: number) => (
+            Array.isArray(tool?.toolImages) && tool.toolImages.length > 0 && tool.toolImages.filter((_, i) => i === 0).map((image: string, index: number) => (
               <img
                 key={index}
                 alt="Tool Usage Image"
@@ -371,7 +371,10 @@ const ToolViewPage = () => {
                 [&>button]:dark:bg-secondary-bg/30! [&>button]:text-primary-color! [&>button]:dark:text-secondary-color! 
                 [&>button]:rounded-xl! [&>button]:px-5! [&>button]:py-3! [&>button]:text-sm! [&>button]:font-medium! dark:[&>button>span]:text-main-color!"
             >
-                <button type="button" >
+                <button 
+                  type="button"
+                  onClick={() => navigate(`/category/${tool?.primaryCategory}`)}
+                >
                     <span className="material-symbols-outlined">lightbulb_2</span>
                     <h3>
                       {`View${
@@ -392,7 +395,11 @@ const ToolViewPage = () => {
 
       <main className="flex flex-col gap-4 bg-primary-bg px-6 py-15 rounded-3xl">
         <p className="text-sm text-secondary-color font-extralight">{tool.fullDetail}</p>
-        <button type="button" className="-mb-2 bg-secondary-bg! text-center! py-3!">Visit Website</button>
+        <button 
+          type="button" 
+          onClick={() => window.open(tool?.links.website || '#', '_blank')}
+          className="-mb-2 bg-secondary-bg! text-center! py-3!"
+        >Visit Website</button>
         <button type="button" className="-mb-2 bg-main-color! text-center! py-3! text-black-color!">Save</button>
       </main>
 

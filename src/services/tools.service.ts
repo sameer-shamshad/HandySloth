@@ -2,22 +2,6 @@ import axios from '../lib/axios';
 import { AxiosError } from 'axios';
 import type { Tool, ToolCard, User, UserBookmarkedTool, CreateToolInput } from '../types';
 
-interface CreateToolRequest {
-  name: string;
-  logo?: string;
-  shortDescription?: string;
-  fullDetail?: string;
-  toolImages?: string[];
-  category: string[];
-  primaryCategory: string; // Required primary category (single value)
-  tags: string[];
-  links: {
-    telegram: string;
-    x: string;
-    website: string;
-  };
-}
-
 interface CreateToolResponse {
   tool: ToolCard;
   message: string;

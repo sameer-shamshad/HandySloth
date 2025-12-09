@@ -6,6 +6,7 @@ import { useTools } from "../context/ToolsProvider";
 import ToolNotFound from "../components/Tools/ToolNotFound";
 import ToolCommunityRatings from "../components/Tools/ToolCommunityRatings";
 import { fetchToolById } from "../services/tools.service";
+import { formatRelativeTime } from "../utils/time";
 
 const ToolViewPage = () => {
   const { id } = useParams();
@@ -41,17 +42,18 @@ const ToolViewPage = () => {
         if (isCancelled) return;
         
         const fetchedTool = response.tool;
+        console.log(response);
         
         // Set popular alternative from the response
         if (response.alternative) {
           setPopularAlternative({
-            _id: response.alternative.tool._id,
-            name: response.alternative.tool.name,
-            totalSaved: response.alternative.totalSaved,
-            totalAlternatives: response.alternative.totalAlternatives,
+            _id: response.alternative.tool?._id || '',
+            name: response.alternative.tool?.name || '',
+            totalSaved: response.alternative.totalSaved || 0,
+            totalAlternatives: response.alternative.totalAlternatives || 0,
           });
         }
-        
+
         // Check if tool exists in any of the machine arrays (recentTools, trendingTools, popularTools)
         const { recentTools, trendingTools, popularTools } = state.context;
         const allTools = [...recentTools, ...trendingTools, ...popularTools];
@@ -115,7 +117,7 @@ const ToolViewPage = () => {
           <span className="material-symbols-outlined text-gray-500! text-lg!">
             history
           </span>
-          <span className="text-sm text-gray-400!">Added 1m ago</span>
+          <span className="text-sm text-gray-400!">{tool?.createdAt ? `Added ${formatRelativeTime(new Date(tool.createdAt).getTime())}` : 'Added recently'}</span>
         </div>
       </div>
 

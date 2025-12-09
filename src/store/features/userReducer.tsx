@@ -11,7 +11,7 @@ type UserState = {
   toolIds: string[]; // Array of tool IDs
   bookmarkedToolIds: string[]; // Array of bookmarked tool IDs
   upvotedToolIds: string[]; // Array of upvoted tool IDs
-  
+
   tools: Tool[]; // Array of tools
   bookmarkedTools: Tool[]; // Array of bookmarked tools
   bookmarkedToolsDisplay: UserBookmarkedTool[]; // Array of bookmarked tools for display (name, logo)

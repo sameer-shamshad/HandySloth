@@ -61,7 +61,7 @@ export const toolMachine = setup({
     }),
     addTool: assign(({ context, event }) => {
       if (event.type !== 'ADD_TOOL') return context;
-     
+    
       if (event.toolListType === 'recent') {
         return { ...context, recentTools: [event.tool, ...context.recentTools] };
       } else if (event.toolListType === 'trending') {

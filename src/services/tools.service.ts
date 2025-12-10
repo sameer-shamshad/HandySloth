@@ -2,6 +2,7 @@ import axios from '../lib/axios';
 import { AxiosError } from 'axios';
 import type { Tool, ToolCard, User, UserBookmarkedTool, CreateToolInput } from '../types';
 
+export type SearchedTool = UserBookmarkedTool;
 export type UserRecentlyViewedTool = UserBookmarkedTool; // Same structure: _id, name, logo
 
 interface CreateToolResponse {
@@ -421,6 +422,28 @@ export const fetchRecentlyViewedTools = async (): Promise<UserRecentlyViewedTool
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch recently viewed tools');
+    }
+    throw error;
+  }
+};
+
+interface SearchToolsResponse {
+  tools: SearchedTool[];
+  message: string;
+}
+
+export const searchTools = async (query: string): Promise<SearchedTool[]> => {
+  try {
+    const response = await axios.get<SearchToolsResponse>(`/api/tool/search?name=${encodeURIComponent(query)}`);
+
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to search tools');
+    }
+
+    return response.data.tools || [];
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to search tools');
     }
     throw error;
   }

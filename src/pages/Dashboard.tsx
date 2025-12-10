@@ -47,13 +47,7 @@ const DashboardPage = () => {
   const toolsCount = userToolIds.length;
   const upvotesCount = upvotedToolIds.length;
   const bookmarksCount = bookmarkedToolIds.length;
-
-  // Transform bookmarkedToolsDisplay to format expected by ToolList
-  const bookmarkedToolsForDisplay = bookmarkedToolsDisplay.map(tool => ({
-    name: tool.name,
-    logo: tool.logo,
-  }));
-  console.log(recentlyViewedTools);
+  
   // Update tools count, bookmarks count, and votes count dynamically
   const updatedProfileStats = profileStats.map(stat => {
     if (stat.icon === "tools") {
@@ -103,8 +97,8 @@ const DashboardPage = () => {
             </div>
         </div>
 
-        <ToolList tools={bookmarkedToolsForDisplay} label="My Bookmarks" />
-        <ToolList tools={recentlyViewedTools} label="Recently Viewed" />
+        <ToolList tools={bookmarkedToolsDisplay} label="My Bookmarks" clickable={false} />
+        <ToolList tools={recentlyViewedTools} label="Recently Viewed" clickable={false} />
 
         <div className='flex flex-col gap-0 text-secondary-color'>
             <p>Help us understand how we're doing</p>

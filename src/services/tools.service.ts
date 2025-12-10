@@ -148,45 +148,23 @@ export const fetchToolById = async (toolId: string): Promise<FetchToolByIdRespon
   }
 };
 
-interface FetchRecentToolsResponse {
-  tools: Tool[];
+interface FetchToolsByTypeResponse {
+  tools: ToolCard[];
   message: string;
 }
 
-export const fetchRecentTools = async (): Promise<Tool[]> => {
+export const fetchToolsByType = async (type: 'recent' | 'trending' | 'popular'): Promise<ToolCard[]> => {
   try {
-    const response = await axios.get<FetchRecentToolsResponse>('/api/tool/recent');
+    const response = await axios.get<FetchToolsByTypeResponse>(`/api/tool/type/${type}`);
     
     if (response.status !== 200) {
-      throw new Error(response.data.message || 'Failed to fetch recent tools');
+      throw new Error(response.data.message || `Failed to fetch ${type} tools`);
     }
 
-    return response.data.tools;
+    return response.data.tools || [];
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
-      throw new Error(error.response?.data.message || 'Failed to fetch recent tools');
-    }
-    throw error;
-  }
-};
-
-interface FetchTrendingToolsResponse {
-  tools: Tool[];
-  message: string;
-}
-
-export const fetchTrendingTools = async (): Promise<Tool[]> => {
-  try {
-    const response = await axios.get<FetchTrendingToolsResponse>('/api/tool/trending');
-    
-    if (response.status !== 200) {
-      throw new Error(response.data.message || 'Failed to fetch trending tools');
-    }
-
-    return response.data.tools;
-  } catch (error: unknown) {
-    if (error instanceof AxiosError) {
-      throw new Error(error.response?.data.message || 'Failed to fetch trending tools');
+      throw new Error(error.response?.data.message || `Failed to fetch ${type} tools`);
     }
     throw error;
   }

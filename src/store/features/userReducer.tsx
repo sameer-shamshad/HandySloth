@@ -2,7 +2,7 @@ import type { RootState, AppDispatch } from "../store";
 import { logoutThunk, checkSessionThunk } from "./AuthReducer";
 import type { ToolCard, UserBookmarkedTool } from "../../types";
 import { createReducer, createAsyncThunk, createAction } from "@reduxjs/toolkit";
-import { fetchUserToolIds, fetchBookmarkedToolIds, fetchUpvotedToolIds, fetchBookmarkedTools } from "../../services/tools.service";
+import { fetchUserToolIds, fetchBookmarkedToolIds, fetchUpvotedToolIds, fetchBookmarkedTools, fetchRecentlyViewedTools, type UserRecentlyViewedTool } from "../../services/tools.service";
 
 const USER_STATE_KEY = 'userState';
 
@@ -14,25 +14,30 @@ type UserState = {
   tools: ToolCard[]; // Array of tools
   bookmarkedTools: ToolCard[]; // Array of bookmarked tools
   bookmarkedToolsDisplay: UserBookmarkedTool[]; // Array of bookmarked tools for display (name, logo)
+  recentlyViewedTools: UserRecentlyViewedTool[]; // Array of recently viewed tools for display (name, logo)
   upvotedTools: ToolCard[]; // Array of upvoted tools
+
   isLoadingTools: boolean;
   isLoadingBookmarks: boolean;
   isLoadingBookmarkedToolsDisplay: boolean;
+  isLoadingRecentlyViewedTools: boolean;
   isLoadingUpvotedTools: boolean;
   error: string | null;
   bookmarksError: string | null;
   bookmarkedToolsDisplayError: string | null;
+  recentlyViewedToolsError: string | null;
   upvotedToolsError: string | null;
 }
 
 // Helper function to save user state to localStorage
 const saveToLocalStorage = (state: UserState) => {
   try {
-    // Only save tool IDs, not loading states or errors
+    // Only save tool IDs and recentlyViewedTools, not loading states or errors
     const stateToSave = {
       toolIds: state.toolIds,
       upvotedToolIds: state.upvotedToolIds,
       bookmarkedToolIds: state.bookmarkedToolIds,
+      recentlyViewedTools: state.recentlyViewedTools,
     };
     localStorage.setItem(USER_STATE_KEY, JSON.stringify(stateToSave));
   } catch (error) {
@@ -41,7 +46,7 @@ const saveToLocalStorage = (state: UserState) => {
 };
 
 // Helper function to load user state from localStorage
-export const loadPersistedUserState = (): { toolIds: string[]; bookmarkedToolIds: string[]; upvotedToolIds: string[] } => {
+export const loadPersistedUserState = (): { toolIds: string[]; bookmarkedToolIds: string[]; upvotedToolIds: string[]; recentlyViewedTools: UserRecentlyViewedTool[] } => {
   try {
     const persistedState = localStorage.getItem(USER_STATE_KEY);
     if (persistedState) {
@@ -50,6 +55,7 @@ export const loadPersistedUserState = (): { toolIds: string[]; bookmarkedToolIds
         toolIds: parsed.toolIds || [],
         bookmarkedToolIds: parsed.bookmarkedToolIds || [],
         upvotedToolIds: parsed.upvotedToolIds || [],
+        recentlyViewedTools: parsed.recentlyViewedTools || [],
       };
     }
   } catch (error) {
@@ -60,6 +66,7 @@ export const loadPersistedUserState = (): { toolIds: string[]; bookmarkedToolIds
     toolIds: [],
     bookmarkedToolIds: [],
     upvotedToolIds: [],
+    recentlyViewedTools: [],
   };
 };
 
@@ -79,14 +86,17 @@ const initialState: UserState = {
   tools: [],
   bookmarkedTools: [],
   bookmarkedToolsDisplay: [],
+  recentlyViewedTools: [],
   upvotedTools: [],
   isLoadingTools: false,
   isLoadingBookmarks: false,
   isLoadingBookmarkedToolsDisplay: false,
+  isLoadingRecentlyViewedTools: false,
   isLoadingUpvotedTools: false,
   error: null,
   bookmarksError: null,
   bookmarkedToolsDisplayError: null,
+  recentlyViewedToolsError: null,
   upvotedToolsError: null,
 };
 
@@ -186,6 +196,30 @@ export const fetchBookmarkedToolsDisplayThunk = createAsyncThunk<
   }
 );
 
+export const fetchRecentlyViewedToolsThunk = createAsyncThunk<
+  UserRecentlyViewedTool[], // Return array of recently viewed tools
+  void,
+  { state: RootState; dispatch: AppDispatch; rejectValue: string }
+>(
+  'user/fetchRecentlyViewedTools',
+  async (_, { getState, rejectWithValue }) => {
+    const { auth } = getState();
+
+    if (!auth.isAuthenticated) {
+      return rejectWithValue('User is not authenticated');
+    }
+
+    try {
+      const tools = await fetchRecentlyViewedTools();
+
+      return tools;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch recently viewed tools';
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 // Action to add a tool ID to user's tools (optimistic update)
 export const addUserTool = createAction<string>('user/addTool'); // toolId
 
@@ -196,6 +230,9 @@ export const removeBookmarkedTool = createAction<string>('user/removeBookmarkedT
 // Actions to add/remove upvoted tool IDs (for real-time updates)
 export const addUpvotedTool = createAction<string>('user/addUpvotedTool'); // toolId
 export const removeUpvotedTool = createAction<string>('user/removeUpvotedTool'); // toolId
+
+// Action to add recently viewed tool (optimistic update)
+export const addRecentlyViewedTool = createAction<UserRecentlyViewedTool>('user/addRecentlyViewedTool'); // tool with _id, name, logo
 
 // Action to clear all user data (when user is not authenticated)
 export const clearUserData = createAction('user/clearUserData');
@@ -263,6 +300,22 @@ const userReducer = createReducer(initialState, (builder) => {
       state.isLoadingBookmarkedToolsDisplay = false;
       state.bookmarkedToolsDisplayError = action.payload || 'Failed to fetch bookmarked tools display';
     })
+    // Fetch recently viewed tools
+    .addCase(fetchRecentlyViewedToolsThunk.pending, (state) => {
+      state.isLoadingRecentlyViewedTools = true;
+      state.recentlyViewedToolsError = null;
+    })
+    .addCase(fetchRecentlyViewedToolsThunk.fulfilled, (state, action) => {
+      state.isLoadingRecentlyViewedTools = false;
+      state.recentlyViewedTools = action.payload;
+      state.recentlyViewedToolsError = null;
+      // Save to localStorage after updating recently viewed tools
+      saveToLocalStorage(state);
+    })
+    .addCase(fetchRecentlyViewedToolsThunk.rejected, (state, action) => {
+      state.isLoadingRecentlyViewedTools = false;
+      state.recentlyViewedToolsError = action.payload || 'Failed to fetch recently viewed tools';
+    })
     // Add tool ID to user's tools (optimistic update)
     .addCase(addUserTool, (state, action) => {
       const toolId = action.payload;
@@ -304,6 +357,14 @@ const userReducer = createReducer(initialState, (builder) => {
       // Save to localStorage after removing upvote
       saveToLocalStorage(state);
     })
+    // Add recently viewed tool (optimistic update)
+    .addCase(addRecentlyViewedTool, (state, action) => {
+      const tool = action.payload;
+      state.recentlyViewedTools = state.recentlyViewedTools.filter(t => t._id !== tool._id);
+      state.recentlyViewedTools = [tool, ...state.recentlyViewedTools].slice(0, 5); 
+      
+      saveToLocalStorage(state);
+    })
     // Clear user data on logout
     .addCase(logoutThunk.fulfilled, (state) => {
       state.toolIds = [];
@@ -312,14 +373,17 @@ const userReducer = createReducer(initialState, (builder) => {
       state.tools = [];
       state.bookmarkedTools = [];
       state.bookmarkedToolsDisplay = [];
+      state.recentlyViewedTools = [];
       state.upvotedTools = [];
       state.isLoadingTools = false;
       state.isLoadingBookmarks = false;
       state.isLoadingBookmarkedToolsDisplay = false;
+      state.isLoadingRecentlyViewedTools = false;
       state.isLoadingUpvotedTools = false;
       state.error = null;
       state.bookmarksError = null;
       state.bookmarkedToolsDisplayError = null;
+      state.recentlyViewedToolsError = null;
       state.upvotedToolsError = null;
       // Clear localStorage on logout
       clearLocalStorage();
@@ -331,14 +395,17 @@ const userReducer = createReducer(initialState, (builder) => {
       state.tools = [];
       state.bookmarkedTools = [];
       state.bookmarkedToolsDisplay = [];
+      state.recentlyViewedTools = [];
       state.upvotedTools = [];
       state.isLoadingTools = false;
       state.isLoadingBookmarks = false;
       state.isLoadingBookmarkedToolsDisplay = false;
+      state.isLoadingRecentlyViewedTools = false;
       state.isLoadingUpvotedTools = false;
       state.error = null;
       state.bookmarksError = null;
       state.bookmarkedToolsDisplayError = null;
+      state.recentlyViewedToolsError = null;
       state.upvotedToolsError = null;
       
       clearLocalStorage(); // Clear localStorage on logout failure too
@@ -351,14 +418,17 @@ const userReducer = createReducer(initialState, (builder) => {
       state.tools = [];
       state.bookmarkedTools = [];
       state.bookmarkedToolsDisplay = [];
+      state.recentlyViewedTools = [];
       state.upvotedTools = [];
       state.isLoadingTools = false;
       state.isLoadingBookmarks = false;
       state.isLoadingBookmarkedToolsDisplay = false;
+      state.isLoadingRecentlyViewedTools = false;
       state.isLoadingUpvotedTools = false;
       state.error = null;
       state.bookmarksError = null;
       state.bookmarkedToolsDisplayError = null;
+      state.recentlyViewedToolsError = null;
       state.upvotedToolsError = null;
       // Clear localStorage when session check fails
       clearLocalStorage();
@@ -371,14 +441,17 @@ const userReducer = createReducer(initialState, (builder) => {
       state.tools = [];
       state.bookmarkedTools = [];
       state.bookmarkedToolsDisplay = [];
+      state.recentlyViewedTools = [];
       state.upvotedTools = [];
       state.isLoadingTools = false;
       state.isLoadingBookmarks = false;
       state.isLoadingBookmarkedToolsDisplay = false;
+      state.isLoadingRecentlyViewedTools = false;
       state.isLoadingUpvotedTools = false;
       state.error = null;
       state.bookmarksError = null;
       state.bookmarkedToolsDisplayError = null;
+      state.recentlyViewedToolsError = null;
       state.upvotedToolsError = null;
       // Clear localStorage
       clearLocalStorage();

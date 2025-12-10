@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useTools } from '../context/ToolsProvider';
 import ToolList from '../components/Profile/ToolList';
 import ProfileCard from '../components/Profile/ProfileCard';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
@@ -36,8 +35,7 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAuth();
-  const { state: toolsState } = useTools();
-  const { toolIds: userToolIds, bookmarkedToolIds, upvotedToolIds, bookmarkedToolsDisplay, isLoadingBookmarkedToolsDisplay } = useAppSelector((state) => state.user);
+  const { toolIds: userToolIds, bookmarkedToolIds, upvotedToolIds, bookmarkedToolsDisplay, recentlyViewedTools, isLoadingBookmarkedToolsDisplay } = useAppSelector((state) => state.user);
 
   // Fetch bookmarked tools display if not already loaded and user is authenticated
   useEffect(() => {
@@ -55,7 +53,7 @@ const DashboardPage = () => {
     name: tool.name,
     logo: tool.logo,
   }));
-
+  console.log(recentlyViewedTools);
   // Update tools count, bookmarks count, and votes count dynamically
   const updatedProfileStats = profileStats.map(stat => {
     if (stat.icon === "tools") {
@@ -69,12 +67,6 @@ const DashboardPage = () => {
     }
     return stat;
   });
-
-  // Get recent tools from ToolMachine (first 5 for recently viewed)
-  const recentlyViewed = toolsState.context.recentTools.slice(0, 5).map(tool => ({
-    name: tool.name,
-    logo: tool.logo,
-  }));
 
   return (
     <div className='flex flex-col gap-8 xl:gap-10'>
@@ -112,7 +104,7 @@ const DashboardPage = () => {
         </div>
 
         <ToolList tools={bookmarkedToolsForDisplay} label="My Bookmarks" />
-        <ToolList tools={recentlyViewed} label="Recently Viewed" />
+        <ToolList tools={recentlyViewedTools} label="Recently Viewed" />
 
         <div className='flex flex-col gap-0 text-secondary-color'>
             <p>Help us understand how we're doing</p>

@@ -1,6 +1,6 @@
 import type { Middleware } from '@reduxjs/toolkit';
 import { setAuthenticated, checkSessionThunk } from '../features/AuthReducer';
-import { fetchUserToolsThunk, fetchBookmarkedToolsThunk, fetchBookmarkedToolsDisplayThunk, fetchUpvotedToolsThunk } from '../features/userReducer';
+import { fetchUserToolsThunk, fetchBookmarkedToolsThunk, fetchBookmarkedToolsDisplayThunk, fetchUpvotedToolsThunk, fetchRecentlyViewedToolsThunk } from '../features/userReducer';
 
 /**
  * Helper to check if localStorage has data
@@ -14,8 +14,22 @@ const hasLocalStorageData = (): boolean => {
       return (
         (parsed.toolIds && parsed.toolIds.length > 0) ||
         (parsed.bookmarkedToolIds && parsed.bookmarkedToolIds.length > 0) ||
-        (parsed.upvotedToolIds && parsed.upvotedToolIds.length > 0)
+        (parsed.upvotedToolIds && parsed.upvotedToolIds.length > 0) ||
+        (parsed.recentlyViewedTools && parsed.recentlyViewedTools.length > 0)
       );
+    }
+  } catch (error) {
+    console.error('Failed to check localStorage:', error);
+  }
+  return false;
+};
+
+const hasRecentlyViewedToolsInLocalStorage = (): boolean => {
+  try {
+    const persistedState = localStorage.getItem('userState');
+    if (persistedState) {
+      const parsed = JSON.parse(persistedState);
+      return parsed.recentlyViewedTools && parsed.recentlyViewedTools.length > 0;
     }
   } catch (error) {
     console.error('Failed to check localStorage:', error);
@@ -41,6 +55,11 @@ export const authMiddleware: Middleware = (store) => (next) => (action) => {
 
     // Always fetch bookmarkedToolsDisplay since it's not persisted to localStorage
     store.dispatch(fetchBookmarkedToolsDisplayThunk() as any);
+    
+    // Fetch recentlyViewedTools only if not in localStorage
+    if (!hasRecentlyViewedToolsInLocalStorage()) {
+      store.dispatch(fetchRecentlyViewedToolsThunk() as any);
+    }
   }
 
   // Also trigger fetch on session check success (page reload scenario) - only if localStorage is empty
@@ -53,6 +72,11 @@ export const authMiddleware: Middleware = (store) => (next) => (action) => {
     
     // Always fetch bookmarkedToolsDisplay since it's not persisted to localStorage
     store.dispatch(fetchBookmarkedToolsDisplayThunk() as any);
+    
+    // Fetch recentlyViewedTools only if not in localStorage
+    if (!hasRecentlyViewedToolsInLocalStorage()) {
+      store.dispatch(fetchRecentlyViewedToolsThunk() as any);
+    }
   }
 
   return result;

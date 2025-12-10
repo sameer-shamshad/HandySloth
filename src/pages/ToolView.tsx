@@ -1,16 +1,18 @@
 import { useAuth } from "../context";
 import { useState, useEffect } from "react";
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { formatRelativeTime } from "../utils/time";
 import type { Tool, ToolCategory } from "../types";
 import { fetchToolById, incrementToolView } from "../services/tools.service";
 import ToolNotFound from "../components/Tools/ToolNotFound";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import ToolCommunityRatings from "../components/Tools/ToolCommunityRatings";
+import { addRecentlyViewedTool } from "../store/features/userReducer";
 
 const ToolViewPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, user } = useAuth();
   const { toolIds: userToolIds } = useAppSelector((state) => state.user);
   
@@ -80,17 +82,26 @@ const ToolViewPage = () => {
       return;
     }
 
-    // Increment view (IP-based tracking handled by backend)
+    // Increment view (IP-based tracking handled by backend, userId passed if authenticated)
     const incrementView = async () => {
       try {
-        await incrementToolView(id);
+        await incrementToolView(id, isAuthenticated && user?._id ? user._id : undefined);
+        
+        // If user is authenticated, add tool to recently viewed tools in Redux
+        if (isAuthenticated && user?._id && tool) {
+          dispatch(addRecentlyViewedTool({
+            _id: tool._id,
+            name: tool.name,
+            logo: tool.logo,
+          }));
+        }
       } catch (error) {
         console.error('Failed to increment tool view:', error);
       }
     };
 
     incrementView();
-  }, [id, tool]);
+  }, [id, tool, isAuthenticated, user?._id, dispatch]);
 
   const handleEditTool = () => {
     navigate(`/tool/edit-tool`, { state: { tool } });

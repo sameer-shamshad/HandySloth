@@ -2,6 +2,8 @@ import axios from '../lib/axios';
 import { AxiosError } from 'axios';
 import type { Tool, ToolCard, User, UserBookmarkedTool, CreateToolInput } from '../types';
 
+export type UserRecentlyViewedTool = UserBookmarkedTool; // Same structure: _id, name, logo
+
 interface CreateToolResponse {
   tool: ToolCard;
   message: string;
@@ -246,9 +248,9 @@ interface IncrementViewResponse {
   message: string;
 }
 
-export const incrementToolView = async (toolId: string): Promise<IncrementViewResponse> => {
+export const incrementToolView = async (toolId: string, userId?: string): Promise<IncrementViewResponse> => {
   try {
-    const response = await axios.post<IncrementViewResponse>(`/api/tool/${toolId}/view`);
+    const response = await axios.post<IncrementViewResponse>(`/api/tool/${toolId}/view?userId=${userId}`);
     
     if (response.status !== 200) {
       throw new Error(response.data.message || 'Failed to increment tool view');
@@ -396,6 +398,29 @@ export const fetchBookmarkedTools = async (): Promise<UserBookmarkedTool[]> => {
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data.message || 'Failed to fetch bookmarked tools');
+    }
+    throw error;
+  }
+};
+
+interface FetchRecentlyViewedToolsResponse {
+  tools: UserRecentlyViewedTool[];
+  message: string;
+}
+
+export const fetchRecentlyViewedTools = async (): Promise<UserRecentlyViewedTool[]> => {
+  try {
+    const response = await axios.get<FetchRecentlyViewedToolsResponse>('/api/user/recently-viewed');
+    
+    if (response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to fetch recently viewed tools');
+    }
+
+    console.log('Fetch recently viewed tools response', response.data);
+    return response.data.tools || [];
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data.message || 'Failed to fetch recently viewed tools');
     }
     throw error;
   }
